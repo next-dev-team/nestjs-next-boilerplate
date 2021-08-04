@@ -28,11 +28,26 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+
+## Features
+
+- :white_check_mark: **GraphQl Generator**: Create schema DB to generator schema GraphQl
+
+
 ## Installation
 
 ```bash
 $ yarn install
 ```
+
+
+### Use Gitpod
+
+Open the project in Gitpod (free online dev environment for GitHub) and start coding immediately.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ant-design/ant-design-pro)
+
+More instructions at [documentation](http://pro.ant.design/docs/getting-started).
 
 ## Running the app
 
@@ -63,6 +78,16 @@ $ yarn run test:cov
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Contributing
+
+Any type of contribution is welcome, here are some examples of how you may contribute to this project:
+
+- Use Ant Design Pro in your daily work.
+- Submit [issues](http://github.com/ant-design/ant-design-pro/issues) to report bugs or ask questions.
+- Propose [pull requests](http://github.com/ant-design/ant-design-pro/pulls) to improve our code.
+
+
 
 ## Stay in touch
 
