@@ -24,7 +24,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     const errors = response.message;
 
     const message = Array.isArray(errors)
-      ? errors.map(err => Object.values(err.constraints)).flat()[0]
+      ? errors.map(err => Object.values(err.constraints)).reduce((acc, val) => acc.concat(val), [])[0]
       : response.message;
     // TODO: customize your own error handler
     // ======================================

@@ -1,12 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class ConfigDto {
   @IsNotEmpty()
   NODE_ENV!: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  // @IsNumber()
   @Transform(x => +x)
   PORT!: number;
 

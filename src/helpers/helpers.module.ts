@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { SamplesModule } from 'src/graphql/samples/samples.module';
-import { SamplesService } from 'src/graphql/samples/samples.service';
+import { TodoModule } from 'src/graphql/todo/todo.module';
+import { TodoService } from 'src/graphql/todo/todo.service';
 
-import { SamplesHelperService } from './samples.helper.service';
+import { TodoHelperService } from './todo.helper.service';
 
 @Module({
-  imports: [SamplesModule],
-  providers: [SamplesHelperService, SamplesService],
-  exports: [SamplesHelperService]
+  imports: [TodoModule],
+  providers: [TodoHelperService, TodoService],
+  exports: [TodoHelperService]
 })
 export class HelpersModule {}

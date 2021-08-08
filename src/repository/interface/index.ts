@@ -1,1 +1,1 @@
-export * from './sample.interface';
+export * from './todo.interface';
