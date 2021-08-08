@@ -1,23 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SampleDocument } from 'src/repository';
+import { TodoDocument } from 'src/repository';
+import { Todo } from 'src/todo.ts';
 
-import { Global, T } from '@common';
+import { T } from '@common';
 
 @Injectable()
-export class SamplesService {
-  constructor(@InjectModel('Sample') private model: Model<SampleDocument>) {}
+export class TodoService {
+  constructor(@InjectModel(Todo.name) private model: Model<TodoDocument>) {}
   async create(params: any): Promise<any> {
-    const createdObj = new this.model({
-      ...params,
-      nameTypes: params.nameTypes.map(v => {
-        return { ...v, _id: Global.getObjectId() };
-      }),
-      otherId: Global.getObjectId(params.otherId),
-      createdAt: new Date()
-    });
-    return await createdObj.save();
+    return await this.model.create(params);
   }
   async update(params: any): Promise<any> {
     const { id, ...newParams } = params;

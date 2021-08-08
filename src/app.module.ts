@@ -1,5 +1,4 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { JwtModule } from '@nestjs/jwt';
@@ -7,14 +6,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
 
 import { AppExceptionFilter } from '@common';
+import { ConfigModule } from '@lib/config';
 import { IORedisModule } from '@lib/ioredis';
-
-// import { IORedisModule } from '@lib/ioredis';
 
 import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import configuration from './config/configuration';
+// import configuration from './config/configuration';
 import { MongooseConfigService } from './config/mongooseconfigservice';
 import { EmailsModule } from './emails/emails.module';
 import { GraphQLModules } from './graphql/graphql.module';
@@ -29,7 +27,7 @@ require('dotenv').config();
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    // ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     MongooseModule.forRootAsync({ useClass: MongooseConfigService }),
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql', //join(process.cwd(), 'src/schema.gql'),
@@ -37,7 +35,7 @@ require('dotenv').config();
       //fieldResolverEnhancers: ['interceptors'],
       introspection: true,
       debug: true,
-      playground: true,
+      // playground: true,
       //installSubscriptionHandlers: true,
       formatError: (error: GraphQLError) => {
         const exc = error.extensions?.exception;
@@ -55,7 +53,7 @@ require('dotenv').config();
       signOptions: { expiresIn: process.env.JWT_EXPIRED }
     }),
     HelpersModule,
-    // ConfigModule,
+    ConfigModule,
     IORedisModule,
     ApisModules,
     PwdModule,

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { SamplesModule } from './samples/samples.module';
+import { TodoModule } from './todo/todo.module';
 
 @Module({
   imports: [
     // --
-    SamplesModule
+    TodoModule
   ]
 })
 export class GraphQLModules {}
