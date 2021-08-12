@@ -38,11 +38,13 @@ require('dotenv').config();
       // playground: true,
       //installSubscriptionHandlers: true,
       formatError: (error: GraphQLError) => {
-        const exc = error.extensions?.exception;
-        let message = exc.message;
-        const stacktrace = exc.stacktrace || [];
-        if (!exc.status) message = { statusCode: 500, message: 'Internal server error' };
-        if (exc.status && exc.status === 500) message = { statusCode: 500, message: 'Internal server error' };
+        console.log('error:', error);
+        let message = error.extensions?.response;
+        // let message = exc.message;
+        const stacktrace = message.stacktrace || [];
+        if (!message.statusCode) message = { statusCode: 500, message: 'Internal server error' };
+        if (message.statusCode && message.statusCode === 500)
+          message = { statusCode: 500, message: 'Internal server error' };
         return { ...message, stacktrace };
       },
 
