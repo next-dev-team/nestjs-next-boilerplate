@@ -23,12 +23,16 @@ export class AppExceptionFilter implements ExceptionFilter {
     };
     const errors = response.message;
 
+    console.log('errors:', errors);
+
     const message = Array.isArray(errors)
       ? errors.map(err => Object.values(err.constraints)).reduce((acc, val) => acc.concat(val), [])[0]
       : response.message;
     // TODO: customize your own error handler
     // ======================================
 
+    console.log('message:', message);
+    console.log('statusCode:', statusCode);
     // ! Display log in server. Can also integrate with Mailer if want to alert to developer
     if (statusCode >= 500) {
       console.error(exception);
