@@ -21,11 +21,15 @@ export class AppExceptionFilter implements ExceptionFilter {
       message: any;
       error: string;
     };
+    console.log('statusCode:', statusCode);
+    console.log('response:', response);
     const errors = response.message;
+    console.log('error:', errors);
 
     const message = Array.isArray(errors)
       ? errors.map(err => Object.values(err.constraints)).reduce((acc, val) => acc.concat(val), [])[0]
       : response.message;
+    console.log('message:', message);
     // TODO: customize your own error handler
     // ======================================
 
