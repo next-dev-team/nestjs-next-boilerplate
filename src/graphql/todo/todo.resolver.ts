@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { TodoHelperService } from 'src/helpers/todo.helper.service';
 
@@ -14,6 +14,8 @@ export class TodoResolver {
   @Mutation(() => TodoType)
   async createTodo(@Args('input') input: TodoInput): Promise<any> {
     console.log(this.todoHelperSvc);
+    const existingDoc = await this.service.findOne({ title: input.title });
+    if (existingDoc) throw new BadRequestException('title already exist');
     return await this.service.create({ ...input });
   }
 

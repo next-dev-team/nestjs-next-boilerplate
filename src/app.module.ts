@@ -1,11 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
 
-import { AppExceptionFilter } from '@common';
 import { ConfigModule } from '@lib/config';
 import { IORedisModule } from '@lib/ioredis';
 
@@ -18,7 +16,6 @@ import { EmailsModule } from './emails/emails.module';
 import { GraphQLModules } from './graphql/graphql.module';
 import { HelpersModule } from './helpers/helpers.module';
 import { IORedisController } from './ioredis/ioredis.controller';
-import { IORedisService } from './ioredis/ioredis.service';
 import { JwtsModule } from './lib/jwts/jwts.module';
 import { PwdModule } from './pwd/pwd.module';
 import { AuthMiddleware } from './shared/auth.middleware';
@@ -35,19 +32,26 @@ require('dotenv').config();
       //fieldResolverEnhancers: ['interceptors'],
       introspection: true,
       debug: true,
-      // playground: true,
       //installSubscriptionHandlers: true,
       formatError: (error: GraphQLError) => {
-        console.log('error:', error);
-        let message = error.extensions?.response;
-        // let message = exc.message;
-        const stacktrace = message.stacktrace || [];
-        if (!message.statusCode) message = { statusCode: 500, message: 'Internal server error' };
-        if (message.statusCode && message.statusCode === 500)
-          message = { statusCode: 500, message: 'Internal server error' };
-        return { ...message, stacktrace };
+        const responseError = {} as {
+          statusCode: number;
+          message: string;
+          error: string;
+          stacktrace: any[];
+        };
+        const ext = error.extensions;
+        const statusCode = ext?.response?.statusCode || 500;
+        let message = ext?.response?.message || 'Internal server error';
+        message = Array.isArray(message) ? message[0] : message;
+        const errors = ext?.response?.error || 'Internal Server Error';
+        const stacktrace = ext?.exception?.stacktrace || [];
+        responseError.statusCode = statusCode;
+        responseError.message = message;
+        responseError.error = errors;
+        responseError.stacktrace = stacktrace;
+        return responseError;
       },
-
       context: ({ req }) => ({ req })
     }),
     JwtModule.register({
@@ -64,7 +68,15 @@ require('dotenv').config();
     GraphQLModules
   ],
   controllers: [AppController, IORedisController],
-  providers: [AppService, IORedisService, { provide: APP_FILTER, useClass: AppExceptionFilter }]
+  providers: [
+    AppService
+    // IORedisService,
+    // { provide: APP_FILTER, useClass: AppExceptionFilter },
+    // {
+    //   provide: APP_PIPE,
+    //   useClass: ValidationPipe
+    // }
+  ]
 })
 //export class AppModule {}
 export class AppModule implements NestModule {
