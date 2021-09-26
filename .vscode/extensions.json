@@ -1,0 +1,21 @@
+{
+  "recommendations": [
+    "CoenraadS.bracket-pair-colorizer-2",
+    "EditorConfig.EditorConfig",
+    "Tyriar.sort-lines",
+    "aaron-bond.better-comments",
+    "alefragnani.Bookmarks",
+    "christian-kohler.path-intellisense",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "formulahendry.code-runner",
+    "kumar-harsh.graphql-for-vscode",
+    "mikestead.dotenv",
+    "rbbit.typescript-hero",
+    "streetsidesoftware.code-spell-checker",
+    "vscode-icons-team.vscode-icons",
+    "xabikos.JavaScriptSnippets",
+    "yzhang.markdown-all-in-one"
+  ]
+}
