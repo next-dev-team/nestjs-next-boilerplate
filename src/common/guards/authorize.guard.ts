@@ -12,7 +12,7 @@ import { JwtsService } from '@lib/jwts/jwts.service';
 export const Authorize = () => UseGuards(AuthorizeGuard);
 
 @Injectable()
-class AuthorizeGuard implements CanActivate {
+export class AuthorizeGuard implements CanActivate {
   constructor(
     private jwtsService: JwtsService,
     // private devService: DevelopersService,

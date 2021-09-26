@@ -12,7 +12,7 @@ import { JwtsService } from '@lib/jwts/jwts.service';
 export const Authenticate = () => UseGuards(AuthenticateGuard);
 
 @Injectable()
-class AuthenticateGuard implements CanActivate {
+export class AuthenticateGuard implements CanActivate {
   constructor(private jwtsService: JwtsService, @InjectIORedis() private readonly redis: Redis) {}
 
   async canActivate(context: ExecutionContext): Promise<any> {

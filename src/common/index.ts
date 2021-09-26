@@ -31,6 +31,7 @@ export * as Global from './utils'
 */
 export { Authorize } from './guards/authorize.guard';
 export { Authenticate } from './guards/authenticate.guard';
+export { AuthenticateAuthorize } from './guards/authen-authorize.guard';
 /*
 |--------------------------------------------------------------------------
 | Decorators
