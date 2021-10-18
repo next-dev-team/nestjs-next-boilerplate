@@ -44,6 +44,7 @@
     "gmail",
     "homenet",
     "Injectable",
+    "Jwts",
     "keycloak",
     "ldap",
     "Metacounter",

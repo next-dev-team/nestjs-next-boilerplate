@@ -1,11 +1,11 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
 
 import { ConfigModule } from '@lib/config';
 import { IORedisModule } from '@lib/ioredis';
+import { JwtModule } from '@lib/jwts/jwts.module';
 
 import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
@@ -16,7 +16,6 @@ import { EmailsModule } from './emails/emails.module';
 import { GraphQLModules } from './graphql/graphql.module';
 import { HelpersModule } from './helpers/helpers.module';
 import { IORedisController } from './ioredis/ioredis.controller';
-import { JwtsModule } from './lib/jwts/jwts.module';
 import { PwdModule } from './pwd/pwd.module';
 import { AuthMiddleware } from './shared/auth.middleware';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -54,17 +53,14 @@ require('dotenv').config();
       },
       context: ({ req }) => ({ req })
     }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_EXPIRED }
-    }),
+
     HelpersModule,
     ConfigModule,
     IORedisModule,
     ApisModules,
     PwdModule,
     EmailsModule,
-    JwtsModule,
+    JwtModule,
     GraphQLModules
   ],
   controllers: [AppController, IORedisController],

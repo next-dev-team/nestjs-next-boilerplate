@@ -26,3 +26,5 @@ export class Todo {
   updatedAt!: Date;
 }
 export const TodoSchema = SchemaFactory.createForClass(Todo);
+
+export type TodoDocument = Todo & Document;

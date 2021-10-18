@@ -33,6 +33,7 @@ export class AuthenticateGuard implements CanActivate {
       // if (!devDoc.verifyStatus) return new BadRequestException('AuthKey is not verified yet');
       return true;
     } catch (e) {
+      // @ts-ignore
       throw new UnauthorizedException(e.response.message);
     }
   }

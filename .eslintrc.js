@@ -32,6 +32,7 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'import/no-unresolved': 'off',
     'import/order': [
       'error',
@@ -53,5 +54,5 @@ module.exports = {
   },
   settings: {
     'import/internal-regex': '^@api|@common|@dynamodb|@entities|@lib|@models|@queries|@repositories|@schema/'
-  },
+  }
 };

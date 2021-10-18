@@ -40,6 +40,7 @@ export class AuthorizeGuard implements CanActivate {
       req.user = {};
       return req;
     } catch (e) {
+      // @ts-ignore
       throw new ForbiddenException(e.response.message);
     }
   }
