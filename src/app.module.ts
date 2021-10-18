@@ -1,30 +1,26 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLError } from 'graphql';
 
 import { ConfigModule } from '@lib/config';
 import { IORedisModule } from '@lib/ioredis';
-import { JwtModule } from '@lib/jwts/jwts.module';
+import { JwtModule } from '@lib/jwt';
+import { MongooseModule } from '@lib/mongoose';
 
 import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 // import configuration from './config/configuration';
-import { MongooseConfigService } from './config/mongooseconfigservice';
 import { EmailsModule } from './emails/emails.module';
 import { GraphQLModules } from './graphql/graphql.module';
 import { HelpersModule } from './helpers/helpers.module';
-import { IORedisController } from './ioredis/ioredis.controller';
-import { PwdModule } from './pwd/pwd.module';
 import { AuthMiddleware } from './shared/auth.middleware';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 @Module({
   imports: [
-    // ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    MongooseModule.forRootAsync({ useClass: MongooseConfigService }),
+    MongooseModule,
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql', //join(process.cwd(), 'src/schema.gql'),
       //typePaths: ['./**/*.gql'],
@@ -58,12 +54,11 @@ require('dotenv').config();
     ConfigModule,
     IORedisModule,
     ApisModules,
-    PwdModule,
     EmailsModule,
     JwtModule,
     GraphQLModules
   ],
-  controllers: [AppController, IORedisController],
+  controllers: [AppController],
   providers: [
     AppService
     // IORedisService,

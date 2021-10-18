@@ -1,10 +1,9 @@
 import { NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { NextFunction, Request, Response } from 'express';
 
-import { JwtsService } from '@lib/jwts/jwts.service';
-
 export class AuthMiddleware implements NestMiddleware {
-  constructor(private jwtsService: JwtsService) {}
+  constructor(private jwtsService: JwtService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     //console.log(req)
@@ -25,7 +24,7 @@ export class AuthMiddleware implements NestMiddleware {
     const token = auth.split(' ')[1];
     //console.log('token', token);
     try {
-      const result = await this.jwtsService.verifyToken(token);
+      const result = await this.jwtsService.verifyAsync(token);
       //console.log('result: ', result)
       return result;
     } catch (err) {

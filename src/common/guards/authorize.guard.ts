@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UseGuards } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { JwtService } from '@nestjs/jwt';
 import { Redis } from 'ioredis';
 
 import { InjectIORedis } from '@lib/ioredis';
-import { JwtsService } from '@lib/jwts/jwts.service';
 
 /**
  * The act of verifying the access rights of a user to interact with a resource.
@@ -14,7 +14,7 @@ export const Authorize = () => UseGuards(AuthorizeGuard);
 @Injectable()
 export class AuthorizeGuard implements CanActivate {
   constructor(
-    private jwtsService: JwtsService,
+    private jwtsService: JwtService,
     // private devService: DevelopersService,
     @InjectIORedis() private readonly redis: Redis
   ) {}
@@ -27,7 +27,7 @@ export class AuthorizeGuard implements CanActivate {
       if (!authorization.startsWith('Bearer')) throw new ForbiddenException('Invalid token');
       const token = authorization.substr(7);
       // verify token
-      const { id } = await this.jwtsService.verifyToken(token);
+      const { id } = await this.jwtsService.verifyAsync(token);
       // check token on redis
       const redisResult = await this.redis.hgetall(id);
       const redisKeys = Object.keys(redisResult);

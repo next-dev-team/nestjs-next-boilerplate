@@ -1,11 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-
-import { JwtsService } from '@lib/jwts/jwts.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthGaurd implements CanActivate {
-  constructor(private jwtsService: JwtsService) {}
+  constructor(private jwtsService: JwtService) {}
 
   async canActivate(context: ExecutionContext) {
     //const {req, res, payload, connection} = GqlExecutionContext.create(context).getContext();
@@ -33,7 +32,7 @@ export class AuthGaurd implements CanActivate {
     const token = auth.split(' ')[1];
     console.log('token', token);
     try {
-      const result = await this.jwtsService.verifyToken(token);
+      const result = await this.jwtsService.verifyAsync(token);
       //console.log('result: ', result)
       return result;
     } catch (err) {

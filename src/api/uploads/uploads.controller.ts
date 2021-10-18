@@ -4,7 +4,7 @@ import * as AWS from 'aws-sdk';
 import * as multerS3 from 'multer-s3';
 import { extname } from 'path';
 
-import { Global } from '@common';
+import { UTIL } from '@common';
 
 import { UploadBody } from './dto/uploads.input.dto';
 import { UploadsService } from './uploads.service';
@@ -31,7 +31,7 @@ export class UploadsController {
           cb(null, `${Date.now().toString()}${extname(file.originalname)}`);
         }
       }),
-      fileFilter: Global.imageFileFilter
+      fileFilter: UTIL.imageFileFilter
     })
   )
   uploadFiles(@Body() body: UploadBody, @UploadedFiles() files) {
@@ -51,6 +51,7 @@ export class UploadsController {
     try {
       await this.service.fileupload(request, response);
     } catch (error) {
+      // @ts-ignore
       return response.status(500).json(`Failed to upload image file: ${error.message}`);
     }
   }
