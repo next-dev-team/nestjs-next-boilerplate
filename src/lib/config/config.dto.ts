@@ -12,4 +12,6 @@ export class ConfigDto {
 
   @IsNotEmpty()
   JWT_SECRET!: string;
+
+  JWT_EXPIRED?: string;
 }

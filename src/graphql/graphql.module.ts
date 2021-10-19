@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AuthResolver } from './auth/auth.resolver';
 import { TodoModule } from './todo/todo.module';
 import { UserModule } from './user/user.module';
 
@@ -8,6 +9,10 @@ import { UserModule } from './user/user.module';
     // --
     TodoModule,
     UserModule
+  ],
+  providers: [
+    //--,
+    AuthResolver
   ]
 })
 export class GraphQLModules {}

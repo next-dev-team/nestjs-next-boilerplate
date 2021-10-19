@@ -20,12 +20,12 @@ export class UserService {
       limit: filter.limit,
       offset: (Number(filter.page) - 1) * Number(filter.limit)
     };
-    const { page, limit, ...objectFilter } = filter;
+    const { page, limit, status, ...objectFilter } = filter;
     console.log(pageFilter);
     console.log(objectFilter);
     return await this.model
       .aggregate([
-        { $match: { ...objectFilter, status: { $in: objectFilter.status } } },
+        { $match: { ...objectFilter, username: { $exists: true } } },
         { $skip: pageFilter.offset },
         { $limit: pageFilter.limit },
         { $sort: { _id: -1 } }

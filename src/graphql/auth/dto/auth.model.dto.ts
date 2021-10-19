@@ -2,12 +2,12 @@ import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { BaseModel, Paginated } from 'src/common';
 
 @ObjectType()
-export class UserType extends BaseModel {
-  @Field(() => ID)
+export class AuthType extends BaseModel {
+  @Field(() => ID, { nullable: true })
   id!: string;
 
-  @Field({ nullable: true })
-  username?: string;
+  @Field()
+  username!: string;
 
   @Field({ nullable: true })
   password?: string;
@@ -17,4 +17,4 @@ export class UserType extends BaseModel {
 }
 
 @ObjectType()
-export class PaginatedUserType extends Paginated(UserType) {}
+export class PaginatedAuthType extends Paginated(AuthType) {}

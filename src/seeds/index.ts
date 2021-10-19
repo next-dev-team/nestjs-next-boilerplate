@@ -1,3 +1,1 @@
-import * as sampleData from './sample.json';
-
-export { sampleData };
+export { UsersSeeder } from './user.seeder';

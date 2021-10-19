@@ -2,13 +2,13 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { TodoHelperService } from 'src/helpers/todo.helper.service';
 
-import { GetUser } from '@common';
+import { AuthenticateAuthorize, GetUser } from '@common';
 
 import { TodoFilter, TodoInput, TodoUpdate } from './dto/todo.input.dto';
 import { PaginatedTodoType, TodoType } from './dto/todo.model.dto';
 import { TodoService } from './todo.service';
 
-// @AuthenticateAuthorize()
+@AuthenticateAuthorize()
 @Resolver(() => TodoType)
 export class TodoResolver {
   constructor(private readonly service: TodoService, private todoHelperSvc: TodoHelperService) {}
