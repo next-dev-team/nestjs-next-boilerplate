@@ -21,6 +21,7 @@ require('dotenv').config();
   imports: [
     MongooseModule,
     TypeOrmModule,
+    I18NextModule,
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql', //join(process.cwd(), 'src/schema.gql'),
       //typePaths: ['./**/*.gql'],
@@ -47,9 +48,9 @@ require('dotenv').config();
         responseError.stacktrace = stacktrace;
         return responseError;
       },
-      context: ({ req }) => ({ req })
+      context: ({ req, connection }) => (connection ? { req: connection.context } : { req })
     }),
-    I18NextModule,
+
     HelpersModule,
     ConfigModule,
     IORedisModule,

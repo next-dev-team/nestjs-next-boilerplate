@@ -1,24 +1,34 @@
-FROM node:12-alpine
+FROM node:16-alpine3.11 AS development
 
-ADD package.json /tmp/package.json
+WORKDIR /usr/src/app
 
-RUN rm -rf dist
+COPY package*.json ./
 
-RUN cd /tmp && npm install -q
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 
-RUN npm dedupe
+RUN yarn install
 
-# Code base
-ADD ./ /src
-RUN rm -rf /src/node_modules && cp -a /tmp/node_modules /src/
+COPY . .
 
-# Define working directory
-WORKDIR /src
+RUN yarn build
 
-RUN npm run-script build
+########################
+### Production #########
+########################
 
-RUN npm install pm2 -g
+FROM node:16-alpine3.11 as production
 
-EXPOSE 5000
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
-CMD ["pm2-runtime", "process.json"]
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN yarn install
+
+COPY . .
+
+COPY --from=development /usr/src/app/dist ./dist
+
+CMD ["node", "dist/main"]

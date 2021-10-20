@@ -37,10 +37,10 @@ export class I18NextLib {
         },
         backend: {
           // path where resources get loaded from
-          loadPath: resolve('.', 'assets', 'locales', '', '.json'),
+          loadPath: resolve('.', 'assets', 'locales', '', '.json')
 
           // path to post missing resources
-          addPath: resolve('.', 'assets', 'locales', '', '.missing.json')
+          // addPath: resolve('.', 'assets', 'locales', '', '.missing.json')
         }
       });
 
