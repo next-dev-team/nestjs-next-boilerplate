@@ -1,7 +1,15 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
 
 import { BaseFilter } from '@common';
+
+@InputType()
+class SubAuthInput {
+  @Field()
+  @IsNotEmpty()
+  fullName!: string;
+}
 /**
  * sampleInput
  */
@@ -13,6 +21,11 @@ export class AuthInput {
 
   @Field()
   password!: string;
+
+  @Field(() => SubAuthInput)
+  @ValidateNested()
+  @Type(() => SubAuthInput)
+  profile!: SubAuthInput;
 }
 
 /**

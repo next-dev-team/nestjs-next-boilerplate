@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { GraphQLError } from 'graphql';
 
 import { ConfigModule } from '@lib/config';
+import { GraphQLModule } from '@lib/graphql';
 import { I18NextModule } from '@lib/i18next';
 import { IORedisModule } from '@lib/ioredis';
 import { JwtModule } from '@lib/jwt';
@@ -22,35 +21,7 @@ require('dotenv').config();
     MongooseModule,
     TypeOrmModule,
     I18NextModule,
-    GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql', //join(process.cwd(), 'src/schema.gql'),
-      //typePaths: ['./**/*.gql'],
-      //fieldResolverEnhancers: ['interceptors'],
-      introspection: true,
-      debug: true,
-      //installSubscriptionHandlers: true,
-      formatError: (error: GraphQLError) => {
-        const responseError = {} as {
-          statusCode: number;
-          message: string;
-          error: string;
-          stacktrace: any[];
-        };
-        const ext = error.extensions;
-        const statusCode = ext?.response?.statusCode || 500;
-        let message = ext?.response?.message || 'Internal server error';
-        message = Array.isArray(message) ? message[0] : message;
-        const errors = ext?.response?.error || 'Internal Server Error';
-        const stacktrace = ext?.exception?.stacktrace || [];
-        responseError.statusCode = statusCode;
-        responseError.message = message;
-        responseError.error = errors;
-        responseError.stacktrace = stacktrace;
-        return responseError;
-      },
-      context: ({ req }) => ({ req })
-    }),
-
+    GraphQLModule,
     HelpersModule,
     ConfigModule,
     IORedisModule,
