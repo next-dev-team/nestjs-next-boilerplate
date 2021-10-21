@@ -49,10 +49,6 @@ require('dotenv').config();
         return responseError;
       },
       context: ({ req }) => ({ req })
-      // context: ctx => {
-      //   // console.log('app ctx:', ctx);
-      //   return ctx;
-      // }
     }),
 
     HelpersModule,
@@ -65,5 +61,4 @@ require('dotenv').config();
   controllers: [AppController],
   providers: [AppService]
 })
-//export class AppModule {}
 export class AppModule {}

@@ -14,9 +14,8 @@ async function bootstrap() {
     })
   );
 
-  // get express server runing port for .env
+  // get express server running port for .env
   const config = app.get(ConfigService);
-  // const config = app.select(ConfigModule).get(ConfigService, { strict: true });
 
   const port = config.get('PORT');
 
