@@ -32,6 +32,9 @@
 ## Features
 
 - :white_check_mark: **GraphQl Generator**: Create schema DB to generator schema GraphQl
+- :white_check_mark: **Mongoose Support**: Well support and develop with mongoose
+- :white_check_mark: **Posgresql Support**: Well support and develop with posgressql
+- :white_check_mark: **ResApi Support**: Easy manage route with res api
 
 
 ## Installation
