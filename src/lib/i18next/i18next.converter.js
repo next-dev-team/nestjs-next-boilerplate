@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * ----------------------------------------------------------------------
  * I18next Type-Safe Converter Function
@@ -7,9 +8,7 @@
  * ----------------------------------------------------------------------
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { readdirSync, readFileSync, writeFileSync } = require('fs');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { resolve } = require('path');
 
 // Get list of files in the locales directory

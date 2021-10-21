@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import * as FilesystemBackend from 'i18next-fs-backend';
 import * as i18nextMiddleware from 'i18next-http-middleware';
 import { resolve } from 'path';
 
@@ -10,6 +9,8 @@ import { i18n } from 'i18next';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const i18next: i18n = require('i18next');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const FilesystemBackend = require('i18next-fs-backend');
 export class I18NextLib {
   private logger: Logger = new Logger('i18NextModule');
 
@@ -18,7 +19,7 @@ export class I18NextLib {
       .use(FilesystemBackend)
       .use(i18nextMiddleware.LanguageDetector)
       .init({
-        ns: ['translation', 'notification'], // ! NOTE: ...
+        ns: ['translation'], // ! NOTE: ...
         lng: 'en', // language to use (overrides language detection)
         preload: ['en', 'kh'], // Important on server side to assert translations are loaded before rendering views.
         fallbackLng: 'en', // language to use if translations in user language are not available
@@ -37,10 +38,10 @@ export class I18NextLib {
         },
         backend: {
           // path where resources get loaded from
-          loadPath: resolve('.', 'assets', 'locales', '', '.json')
+          loadPath: resolve('.', 'assets', 'locales', '{{lng}}', '{{ns}}.json'),
 
           // path to post missing resources
-          // addPath: resolve('.', 'assets', 'locales', '', '.missing.json')
+          addPath: resolve('.', 'assets', 'locales', '{{lng}}', '{{ns}}.missing.json')
         }
       });
 
