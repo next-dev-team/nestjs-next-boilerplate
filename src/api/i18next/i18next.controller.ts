@@ -19,6 +19,7 @@ export class I18NextController {
   @ApiQuery({ name: 'lng', required: false })
   @ApiOperation({ summary: 'Localization' })
   async replace(@I18Next() i18n: i18next, @Query('name') name: string) {
+    console.log('name:', name);
     return { message: i18n.t<string, I18NextTranslate>('MyName', { replace: { name } }) };
   }
 }

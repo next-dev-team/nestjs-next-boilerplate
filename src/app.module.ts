@@ -48,7 +48,11 @@ require('dotenv').config();
         responseError.stacktrace = stacktrace;
         return responseError;
       },
-      context: ({ req, connection }) => (connection ? { req: connection.context } : { req })
+      context: ({ req }) => ({ req })
+      // context: ctx => {
+      //   // console.log('app ctx:', ctx);
+      //   return ctx;
+      // }
     }),
 
     HelpersModule,
