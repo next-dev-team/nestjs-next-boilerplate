@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@schemas';
 
 import { GetUser, UTIL } from '@common';
 
@@ -18,8 +19,7 @@ export class UserResolver {
     if (existingDoc) throw new BadRequestException('username already exist');
     const newPass = await UTIL.createPassword(input.password);
     const doc = await this.service.create({ ...input, password: newPass });
-    const token = await this.jtwService.signAsync({ username: doc.username, password: input.password });
-    doc.token = token;
+    // const token = await this.jtwService.signAsync({ username: doc.username, password: input.password });
     return doc;
   }
 
@@ -28,7 +28,7 @@ export class UserResolver {
     const decoded = await this.jtwService.verify(token, { secret: process.env.JWT_SECRET });
     console.log('decoded:', decoded);
     const { username, password } = decoded;
-    const existingDoc = await this.service.findOne({ username });
+    const existingDoc = (await this.service.findOne({ username })) as User;
     if (!existingDoc) throw new BadRequestException('invalid user');
     const vPass = await UTIL.verifyPassword(password, existingDoc.password);
     if (!vPass) throw new BadRequestException('invalid password');
@@ -42,7 +42,7 @@ export class UserResolver {
 
   @Mutation(() => UserType)
   async deleteUser(@Args('id') id: string): Promise<any> {
-    const doc = await this.service.delete(id);
+    const doc = await this.service.softDelete(id);
     if (!doc) return new NotFoundException('Record not found');
     return doc;
   }
@@ -56,12 +56,7 @@ export class UserResolver {
 
   @Query(() => PaginatedUserType)
   async getUserList(@Args('filter') filter: UserFilter): Promise<PaginatedUserType> {
-    const records = await this.service.findAll(filter);
-    const total = await this.service.count(filter);
-    return {
-      records,
-      metadata: { limit: filter.limit, page: filter.page, total }
-    };
+    return await this.service.getPaginatedList(filter);
   }
 
   @Query(() => [UserType])

@@ -29,7 +29,7 @@ export class TodoInput {
 export class TodoUpdate extends TodoInput {
   @Field(() => ID)
   @IsNotEmpty()
-  readonly id?: string;
+  readonly id!: string;
 }
 /**
  * sampleFilter

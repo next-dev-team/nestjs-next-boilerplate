@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '@schema';
+import { User } from '@schemas';
 import { Model } from 'mongoose';
 import { Seeder } from 'nestjs-seeder';
 
@@ -10,7 +10,7 @@ const logger = new Logger('DatabaseSeeder');
 
 @Injectable()
 export class UsersSeeder implements Seeder {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
 
   async seed(): Promise<any> {
     logger.log('🌱 Start seeding...');

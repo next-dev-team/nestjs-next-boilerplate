@@ -1,20 +1,18 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { Resolver, Query, Mutation, Args, ResolveField, Parent } from '@nestjs/graphql';
-import { TodoHelperService } from 'src/helpers/todo.helper.service';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 
-import { AuthenticateAuthorize, GetUser } from '@common';
+import { GetUser } from '@common';
 
 import { TodoFilter, TodoInput, TodoUpdate } from './dto/todo.input.dto';
 import { PaginatedTodoType, TodoType } from './dto/todo.model.dto';
 import { TodoService } from './todo.service';
 
-@AuthenticateAuthorize()
+// @AuthenticateAuthorize()
 @Resolver(() => TodoType)
 export class TodoResolver {
-  constructor(private readonly service: TodoService, private todoHelperSvc: TodoHelperService) {}
+  constructor(private readonly service: TodoService) {}
   @Mutation(() => TodoType)
   async createTodo(@Args('input') input: TodoInput): Promise<any> {
-    console.log(this.todoHelperSvc);
     const existingDoc = await this.service.findOne({ title: input.title });
     if (existingDoc) throw new BadRequestException('title already exist');
     return await this.service.create({ ...input });
@@ -27,7 +25,7 @@ export class TodoResolver {
 
   @Mutation(() => TodoType)
   async deleteTodo(@Args('id') id: string): Promise<any> {
-    const doc = await this.service.delete(id);
+    const doc = await this.service.hardDelete(id);
     if (!doc) return new NotFoundException('Record not found');
     return doc;
   }
@@ -41,12 +39,8 @@ export class TodoResolver {
 
   @Query(() => PaginatedTodoType)
   async getTodoList(@Args('filter') filter: TodoFilter): Promise<PaginatedTodoType> {
-    const records = await this.service.findAll(filter);
-    const total = await this.service.count(filter);
-    return {
-      records,
-      metadata: { limit: filter.limit, page: filter.page, total }
-    };
+    const records = await this.service.getPaginatedList(filter);
+    return records;
   }
 
   @Query(() => [TodoType])
@@ -54,9 +48,9 @@ export class TodoResolver {
     return await this.service.findActive(filter);
   }
 
-  @ResolveField(() => TodoType)
-  async id(@Parent() record: any) {
-    const { _id, id } = record;
-    return id || _id;
-  }
+  // @ResolveField(() => TodoType)
+  // async id(@Parent() record: any) {
+  //   const { _id, id } = record;
+  //   return id || _id;
+  // }
 }

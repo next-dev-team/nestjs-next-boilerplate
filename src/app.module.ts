@@ -12,7 +12,6 @@ import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModules } from './graphql/graphql.module';
-import { HelpersModule } from './helpers/helpers.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -22,7 +21,6 @@ require('dotenv').config();
     TypeOrmModule,
     I18NextModule,
     GraphQLModule,
-    HelpersModule,
     ConfigModule,
     IORedisModule,
     ApisModules,

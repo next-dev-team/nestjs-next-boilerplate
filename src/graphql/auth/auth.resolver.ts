@@ -1,7 +1,8 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-import { UserRepository } from '@repositories';
+import { UserEntity } from '@entities';
 
 import { AuthInput } from './dto/auth.input.dto';
 import { AuthType } from './dto/auth.model.dto';
@@ -9,7 +10,10 @@ import { AuthType } from './dto/auth.model.dto';
 // @AuthenticateAuthorize()
 @Resolver(() => AuthType)
 export class AuthResolver {
-  constructor(@InjectRepository(UserRepository) private readonly user: UserRepository) {}
+  constructor(
+    // @InjectRepository(UserRepository) private readonly userRepo: UserRepository,
+    @InjectRepository(UserEntity) private readonly user: Repository<UserEntity>
+  ) {}
   @Mutation(() => AuthType)
   async createAuth(@Args('input') input: AuthInput): Promise<any> {
     console.log('input:', input);

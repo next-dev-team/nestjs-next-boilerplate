@@ -3,12 +3,12 @@ import { Types } from 'mongoose';
 
 import { T } from '@common';
 @Schema()
-export class User {
+export class Todo {
   @Prop()
-  username!: string;
+  title!: string;
 
   @Prop()
-  password?: string;
+  description?: string;
 
   @Prop({ enum: Object.values(T.StatusEnum), createdIndex: true })
   status!: string;
@@ -25,6 +25,7 @@ export class User {
   @Prop({ type: Date, default: Date.now })
   updatedAt!: Date;
 }
-export const UserSchema = SchemaFactory.createForClass(User);
 
-export type UserDocument = User & Document;
+export const TodoSchema = SchemaFactory.createForClass(Todo);
+
+export type TodoDocument = Todo & Document;

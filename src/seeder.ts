@@ -1,5 +1,5 @@
 import { MongooseModule as _MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '@schema';
+import { User, UserSchema } from '@schemas';
 import { seeder } from 'nestjs-seeder';
 
 import { ConfigModule } from '@lib/config';
