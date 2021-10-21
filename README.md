@@ -50,7 +50,7 @@ Open the project in Gitpod (free online dev environment for GitHub) and start co
 More instructions at [documentation](http://pro.ant.design/docs/getting-started).
 
 ## Running the app
-
+using `yarn`
 ```bash
 # development
 $ yarn start
@@ -61,7 +61,25 @@ $ yarn start:dev
 # production mode
 $ yarn start:prod
 ```
+using `docker`
+```bash
+# watch mode
+$ docker-compose up dev
 
+# production mode
+$ docker-compose up prod
+```
+
+## Seeding
+```bash
+# Seed with clear collection (fresh collection) [Wanning!!! lose data]
+$ yarn seed:refresh
+
+# Seed without clear [Recommended]
+$ yarn seed
+
+Note: if first run or make any change to seeder configuration please run 'yarn build' first to rebuild dist folder.
+```
 ## Test
 
 ```bash
