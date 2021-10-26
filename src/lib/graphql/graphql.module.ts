@@ -31,11 +31,15 @@ import { GraphQLError } from 'graphql';
         // responseError.error = errors;
         // responseError.stacktrace = stacktrace;
         // return responseError;
+        const ext = error.extensions;
+        if (ext?.response && ext.response.message && Array.isArray(ext.response.message)) {
+          ext.response.message = ext.response.message[0];
+        }
         return {
           message: 'Http Exception',
           locations: error.locations,
           path: error.path,
-          extensions: error.extensions
+          extensions: ext
         };
       },
       context: ({ req }) => ({ req })
