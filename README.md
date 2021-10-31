@@ -35,6 +35,8 @@
 - :white_check_mark: **Mongoose Support**: Well support and develop with mongoose
 - :white_check_mark: **Posgresql Support**: Well support and develop with posgressql
 - :white_check_mark: **ResApi Support**: Easy manage route with res api
+- :white_check_mark: **Web Socket Support**: Realtime like chat system
+- :white_check_mark: **Media Streaming Support**: Suppot livestream media
 
 
 ## Installation
