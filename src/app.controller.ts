@@ -1,14 +1,12 @@
 import { Controller, Get, Redirect } from '@nestjs/common';
 
-import { AppService } from './app.service';
-
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  constructor() {}
 
   @Get()
   @Redirect('/graphql')
-  getHello(): string {
-    return this.appService.getHello();
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  getHello() {}
 }

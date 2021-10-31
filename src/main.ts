@@ -2,6 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 import { ConfigService } from '@lib/config';
+import { RedisIoAdapter } from '@lib/socket';
 
 import { AppModule } from './app.module';
 
@@ -13,9 +14,10 @@ async function bootstrap() {
       disableErrorMessages: false
     })
   );
-
   // get express server running port for .env
   const config = app.get(ConfigService);
+
+  app.useWebSocketAdapter(new RedisIoAdapter(app, config));
 
   const port = config.get('PORT');
 
