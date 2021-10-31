@@ -5,6 +5,7 @@ import { GraphQLModule } from '@lib/graphql';
 import { I18NextModule } from '@lib/i18next';
 import { IORedisModule } from '@lib/ioredis';
 import { JwtModule } from '@lib/jwt';
+import { MediaStreamModule } from '@lib/media-stream';
 import { MongooseModule } from '@lib/mongoose';
 import { SocketModule } from '@lib/socket';
 import { TypeOrmModule } from '@lib/typeorm';
@@ -28,7 +29,8 @@ require('dotenv').config();
     JwtModule,
     GraphQLModules,
     SocketModule,
-    SocketProvidersModule
+    SocketProvidersModule,
+    MediaStreamModule
   ],
   controllers: [AppController],
   providers: []
