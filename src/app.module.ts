@@ -6,12 +6,13 @@ import { I18NextModule } from '@lib/i18next';
 import { IORedisModule } from '@lib/ioredis';
 import { JwtModule } from '@lib/jwt';
 import { MongooseModule } from '@lib/mongoose';
+import { SocketModule } from '@lib/socket';
 import { TypeOrmModule } from '@lib/typeorm';
 
 import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GraphQLModules } from './graphql/graphql.module';
+import { SocketProvidersModule } from './socket-provider/socket-provider.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -25,9 +26,11 @@ require('dotenv').config();
     IORedisModule,
     ApisModules,
     JwtModule,
-    GraphQLModules
+    GraphQLModules,
+    SocketModule,
+    SocketProvidersModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: []
 })
 export class AppModule {}
