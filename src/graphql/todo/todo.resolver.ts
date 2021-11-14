@@ -1,5 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import * as admin from 'firebase-admin';
 
 import { GetUser } from '@common';
 
@@ -48,6 +49,17 @@ export class TodoResolver {
     return await this.service.findActive(filter);
   }
 
+  @Mutation(() => Boolean)
+  async pushNotification(): Promise<any> {
+    admin.messaging().send({
+      notification: { title: 'hello', body: 'hello body' },
+      token:
+        'cWuWotuBE9JNv4mA1zPyTK:APA91bE-opAxeekIH1CzkcATMIKq787bkjTwicYwDryTmrrzaqwmww6p9dFBWZ8c7dCEqFBXrfxF22LyMFQINJxRhJx_1LZeECxQd0aguZwyQFvx_g26NfeqaKQ7lf7o-XrkfsSBu6NC'
+    });
+    return true;
+  }
+
+  //!=========== Test firebase =========
   // @ResolveField(() => TodoType)
   // async id(@Parent() record: any) {
   //   const { _id, id } = record;
