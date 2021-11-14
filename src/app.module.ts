@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { ConfigModule } from '@lib/config';
+import { FirebaseAdminModule } from '@lib/firebase-admin';
 import { GraphQLModule } from '@lib/graphql';
 import { I18NextModule } from '@lib/i18next';
 import { IORedisModule } from '@lib/ioredis';
@@ -27,8 +28,9 @@ require('dotenv').config();
     JwtModule,
     GraphQLModules,
     SocketModule,
-    SocketProvidersModule
-    // MediaStreamModule
+    SocketProvidersModule,
+    // MediaStreamModule,
+    FirebaseAdminModule
   ],
   controllers: [AppController],
   providers: []

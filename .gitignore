@@ -41,3 +41,5 @@ lerna-debug.log*
 media/
 
 schema.gql
+
+firebase.json
