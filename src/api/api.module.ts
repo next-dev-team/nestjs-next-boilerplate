@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { AuthController } from './auth/auth.controller';
 import { I18NextController } from './i18next/i18next.controller';
 import { UploadsModule } from './uploads/uploads.module';
 
@@ -9,6 +8,6 @@ import { UploadsModule } from './uploads/uploads.module';
     // --
     UploadsModule
   ],
-  controllers: [I18NextController, AuthController]
+  controllers: [I18NextController]
 })
 export class ApisModules {}
