@@ -7,7 +7,11 @@ import { I18NextModule } from '@lib/i18next';
 import { IORedisModule } from '@lib/ioredis';
 import { JwtModule } from '@lib/jwt';
 import { MongooseModule } from '@lib/mongoose';
+import { MqttModule } from '@lib/mqtt';
+import { RabbitMQModule } from '@lib/rabbitmq';
+import { ScheduleModule } from '@lib/schedule';
 import { SocketModule } from '@lib/socket';
+import { TypeOrmModule } from '@lib/typeorm';
 
 import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
@@ -19,7 +23,7 @@ require('dotenv').config();
 @Module({
   imports: [
     MongooseModule,
-    // TypeOrmModule,
+    TypeOrmModule,
     I18NextModule,
     GraphQLModule,
     ConfigModule,
@@ -30,7 +34,11 @@ require('dotenv').config();
     SocketModule,
     SocketProvidersModule,
     // MediaStreamModule,
-    FirebaseAdminModule
+    FirebaseAdminModule,
+    // HttpModule,
+    MqttModule,
+    RabbitMQModule,
+    ScheduleModule
   ],
   controllers: [AppController],
   providers: []

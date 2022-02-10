@@ -12,7 +12,7 @@ services:
       - .env
     command: yarn start:dev
     ports:
-      - 3000:3000
+      - 3004:3000
     networks:
       - vtech-network
     volumes:

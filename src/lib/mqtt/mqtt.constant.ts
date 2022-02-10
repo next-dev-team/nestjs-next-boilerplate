@@ -1,0 +1,1 @@
+export const MQTT_TOKEN = 'MQTT_INJECT_TOKEN';
