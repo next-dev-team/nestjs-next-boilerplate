@@ -37,7 +37,12 @@
 - :white_check_mark: **ResApi Support**: Easy manage route with res api
 - :white_check_mark: **Web Socket Support**: Realtime like chat system
 - :white_check_mark: **Media Streaming Support**: Suppot livestream media
-
+- :white_check_mark: **MQTT Support**: Pub/Sub messaging queue telemetry
+- :white_check_mark: **RABBITMQ Support**: Publisher/Consumer advance messaging queue
+- :white_check_mark: **I18Next Support**: Support i18next
+- :white_check_mark: **Social Login Support**: Login with social media
+- :white_check_mark: **RABBITMQ Support**: Publisher/Consumer advance messaging queue
+- :white_check_mark: **So On feature**: More features added
 
 ## Installation
 
