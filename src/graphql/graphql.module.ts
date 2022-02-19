@@ -1,18 +1,21 @@
 import { Module } from '@nestjs/common';
-import { UsersLoaders } from 'src/dataloaders';
 
 import { I18nNextResolver } from './i18n-next/i18n-next.resolver';
-import { TodoModule } from './todo/todo.module';
+import { TodoResolver } from './todo/todo.resolver';
+import { TodoService } from './todo/todo.service';
+import { UserResolver } from './user/user.resolver';
+import { UserService } from './user/user.service';
 
 @Module({
-  imports: [
-    // --
-    TodoModule
-  ],
+  imports: [],
   providers: [
     //--,
     I18nNextResolver,
-    UsersLoaders
+    UserResolver,
+    UserService,
+    TodoResolver,
+    TodoService
+    // UsersLoaders
   ]
 })
 export class GraphQLModules {}
