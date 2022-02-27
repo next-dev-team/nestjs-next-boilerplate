@@ -27,7 +27,8 @@
       "@models": ["src/models"],
       "@queries": ["src/queries"],
       "@repositories": ["src/repositories"],
-      "@schemas": ["src/schemas"]
+      "@schemas": ["src/schemas"],
+      "@dataloaders": ["src/dataloaders"]
     }
   },
   "include": ["src/**/*", "typings/**/*.ts"],

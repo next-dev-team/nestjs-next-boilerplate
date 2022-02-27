@@ -21,7 +21,7 @@
   "typescriptHero.imports.grouping": [
     "Plains",
     "Modules",
-    "/^@api|@common|@dynamodb|@entities|@lib|@models|@queries|@repositories|@schemas/",
+    "/^@api|@common|@dataloaders|@dynamodb|@entities|@lib|@models|@queries|@repositories|@schemas/",
     "Workspace"
   ],
   "search.exclude": {
@@ -39,6 +39,7 @@
     "Certbot",
     "cognito",
     "commitlint",
+    "dataloaders",
     "dayoff",
     "dynamodb",
     "elasticbeanstalk",

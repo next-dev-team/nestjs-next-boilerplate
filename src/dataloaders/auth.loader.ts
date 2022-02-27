@@ -8,7 +8,7 @@ import { UserRepository } from '@repositories';
  * Scope.REQUEST => This means that NestJS will reinitialize our class for every request.
  */
 @Injectable({ scope: Scope.REQUEST })
-export class UsersLoaders {
+export class AuthLoaders {
   constructor(@InjectRepository(UserRepository) private readonly userRepo: UserRepository) {}
 
   private _batchUsers = new DataLoader(async (ids: any) => {
