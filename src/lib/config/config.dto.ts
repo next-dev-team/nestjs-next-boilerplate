@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class ConfigDto {
   @IsNotEmpty()
@@ -13,5 +13,15 @@ export class ConfigDto {
   @IsNotEmpty()
   JWT_SECRET!: string;
 
+  @IsOptional()
   JWT_EXPIRED?: string;
+
+  @IsNotEmpty()
+  ENABLE_JAEGER?: boolean;
+
+  @IsOptional()
+  JAEGER_ENDPOINT?: string;
+
+  @IsOptional()
+  JAEGER_SERVICE_NAME?: string;
 }
