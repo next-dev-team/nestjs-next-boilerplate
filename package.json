@@ -50,8 +50,11 @@
     "@nestjs/typeorm": "^8.0.2",
     "@nestjs/websockets": "^8.1.2",
     "@types/faker": "^5.5.9",
+    "@types/jaeger-client": "^3.18.3",
     "@types/uniqid": "^5.2.0",
     "amqplib": "^0.8.0",
+    "apollo-opentracing": "^2.1.72",
+    "apollo-server": "^3.6.7",
     "apollo-server-express": "2.x.x",
     "aws-sdk": "^2.858.0",
     "bcryptjs": "^2.4.3",
@@ -76,6 +79,7 @@
     "i18next-http-middleware": "^3.1.4",
     "install": "^0.13.0",
     "ioredis": "^4.22.0",
+    "jaeger-client": "^3.19.0",
     "lodash": "^4.17.21",
     "mongoose": "^5.13.5",
     "mqtt": "^4.3.5",
@@ -107,12 +111,13 @@
     "@types/bcrypt": "^3.0.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/crypto-js": "^4.0.1",
-    "@types/express": "^4.17.1",
+    "@types/express-serve-static-core": "^4.17.28",
     "@types/i18next-fs-backend": "^1.1.2",
     "@types/ioredis": "^4.22.0",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.168",
     "@types/passport-jwt": "^3.0.3",
+    "@types/serve-static": "^1.13.10",
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
@@ -139,5 +144,8 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "resolutions": {
+    "@types/tapable": "1.0.0"
   }
 }
