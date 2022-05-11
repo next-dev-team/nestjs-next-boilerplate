@@ -7,10 +7,12 @@ import { IORedisModule } from '@lib/ioredis';
 import { JwtModule } from '@lib/jwt';
 import { MongooseModule } from '@lib/mongoose';
 import { ScheduleModule } from '@lib/schedule';
+import { SocketModule } from '@lib/socket';
 
 import { ApisModules } from './api/api.module';
 import { AppController } from './app.controller';
 import { GraphQLModules } from './graphql/graphql.module';
+import { SocketProvidersModule } from './socket-provider/socket-provider.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -26,8 +28,8 @@ require('dotenv').config();
     ApisModules,
     JwtModule,
     GraphQLModules,
-    // SocketModule,
-    // SocketProvidersModule,
+    SocketModule,
+    SocketProvidersModule,
     // MediaStreamModule,
     // FirebaseAdminModule,
     // HttpModule,

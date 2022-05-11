@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import * as admin from 'firebase-admin';
+import { UserGateway } from 'src/socket-provider/user/user.gateway';
 
 import { GetUser } from '@common';
 
@@ -11,7 +12,14 @@ import { TodoService } from './todo.service';
 // @AuthenticateAuthorize()
 @Resolver(() => TodoType)
 export class TodoResolver {
-  constructor(private readonly service: TodoService) {}
+  constructor(private readonly service: TodoService, private socketGateway: UserGateway) {}
+
+  @Mutation(() => Boolean)
+  async pushNotificationToUser(@Args('userId') userId: string): Promise<boolean> {
+    this.socketGateway.emit('welcome', { message: 'hello world' });
+    return true;
+  }
+
   @Mutation(() => TodoType)
   async createTodo(@Args('input') input: TodoInput): Promise<any> {
     const existingDoc = await this.service.findOne({ title: input.title });

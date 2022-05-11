@@ -25,11 +25,11 @@ export class UserGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleConnection(socket: Socket) {
-    this.logger.log(`Socket ID: ${socket.id} connected!`);
+    this.logger.verbose(`Socket ID: ${socket.id} connected!`);
   }
 
   handleDisconnect(socket: Socket) {
-    this.logger.log(`Socket ID: ${socket.id} disconnected!`);
+    this.logger.verbose(`Socket ID: ${socket.id} disconnected!`);
   }
 
   @SubscribeMessage('welcome')
