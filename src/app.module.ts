@@ -6,6 +6,7 @@ import { I18NextModule } from '@lib/i18next';
 import { IORedisModule } from '@lib/ioredis';
 import { JwtModule } from '@lib/jwt';
 import { MongooseModule } from '@lib/mongoose';
+import { RabbitMQModule } from '@lib/rabbitmq';
 import { ScheduleModule } from '@lib/schedule';
 import { SocketModule } from '@lib/socket';
 
@@ -34,7 +35,7 @@ require('dotenv').config();
     // FirebaseAdminModule,
     // HttpModule,
     // MqttModule,
-    // RabbitMQModule,
+    RabbitMQModule,
     ScheduleModule
   ],
   controllers: [AppController],

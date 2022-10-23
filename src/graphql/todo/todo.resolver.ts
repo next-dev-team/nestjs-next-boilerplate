@@ -1,9 +1,11 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import * as Amqp from 'amqplib';
 import * as admin from 'firebase-admin';
 import { UserGateway } from 'src/socket-provider/user/user.gateway';
 
 import { GetUser } from '@common';
+import { RabbitMQService } from '@lib/rabbitmq';
 
 import { TodoFilter, TodoInput, TodoUpdate } from './dto/todo.input.dto';
 import { PaginatedTodoType, TodoType } from './dto/todo.model.dto';
@@ -12,11 +14,22 @@ import { TodoService } from './todo.service';
 // @AuthenticateAuthorize()
 @Resolver(() => TodoType)
 export class TodoResolver {
-  constructor(private readonly service: TodoService, private socketGateway: UserGateway) {}
+  constructor(
+    private readonly service: TodoService,
+    private socketGateway: UserGateway,
+    private rabbitMqService: RabbitMQService
+  ) {
+    this.consumeMsg();
+  }
 
   @Mutation(() => Boolean)
   async pushNotificationToUser(@Args('userId') userId: string): Promise<boolean> {
     this.socketGateway.emit('welcome', { message: 'hello world' });
+    return true;
+  }
+  @Mutation(() => Boolean)
+  async sendMessage(@Args('msg') msg: string): Promise<boolean> {
+    await this.rabbitMqService.sendToQueue('message', msg);
     return true;
   }
 
@@ -65,6 +78,27 @@ export class TodoResolver {
         'cWuWotuBE9JNv4mA1zPyTK:APA91bE-opAxeekIH1CzkcATMIKq787bkjTwicYwDryTmrrzaqwmww6p9dFBWZ8c7dCEqFBXrfxF22LyMFQINJxRhJx_1LZeECxQd0aguZwyQFvx_g26NfeqaKQ7lf7o-XrkfsSBu6NC'
     });
     return true;
+  }
+
+  private async consumeMsg() {
+    const consumeKey = 'message';
+    this.rabbitMqService.getChannel().then(channel => {
+      channel.assertQueue(consumeKey, {
+        durable: true
+      });
+      channel.prefetch(1);
+      channel.consume(
+        consumeKey,
+        async msg => {
+          channel.ack(msg as Amqp.ConsumeMessage);
+          if (msg) {
+            const message = msg.content.toString();
+            console.log('message', message);
+          }
+        },
+        { noAck: false }
+      );
+    });
   }
 
   //!=========== Test firebase =========
