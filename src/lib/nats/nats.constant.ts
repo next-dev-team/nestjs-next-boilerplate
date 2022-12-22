@@ -1,0 +1,1 @@
+export const NATS_TOKEN = 'NATS_INJECT_TOKEN';

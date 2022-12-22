@@ -2084,7 +2084,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
   integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
-"@types/node@^14.0.26", "@types/node@^14.11.2":
+"@types/node@^14.11.2":
   version "14.18.12"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.12.tgz#0d4557fd3b94497d793efd4e7d92df2f83b4ef24"
   integrity sha512-q4jlIR71hUpWTnGhXWcakgkZeHa3CCjcQcnuzU8M891BAWA2jHiziiWEPEkdS5pFsz7H9HJiy8BrK7tBRNrY7A==
@@ -8871,12 +8871,13 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-nats@^2.1.0:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/nats/-/nats-2.6.1.tgz#70cf96be48058028411fef48cdb5bae7ced88f1e"
-  integrity sha512-PwcSZgWS2+JDoiU1Nd25eiV6wdvZbsCrBjyGyhqcJ72+SP2mJw0A0Sz4FKiSehx3mm2A61vwvC9rhkrNAMPpAw==
+nats@^2.10.2:
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/nats/-/nats-2.10.2.tgz#f60a6658fcc503d9f9064d759f68272daf229ad3"
+  integrity sha512-U+3bjrYT/MqEkWDoHH9ql2rm8qt4s8z49yUjvryBvjEV0GtObTqa+BUpcTK6v2SE5fv09qcP7BcfUK0k0/gB0g==
   dependencies:
-    nkeys.js "^1.0.0-9"
+    nkeys.js "1.0.4"
+    web-streams-polyfill "^3.2.1"
 
 natural-compare@^1.4.0:
   version "1.4.0"
@@ -8920,13 +8921,12 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
-nkeys.js@^1.0.0-9:
-  version "1.0.0-9"
-  resolved "https://registry.yarnpkg.com/nkeys.js/-/nkeys.js-1.0.0-9.tgz#c804acb061a5c4a61e8667adbf15bfd2978285ad"
-  integrity sha512-m9O0NQT+3rUe1om6MWpxV77EuHql/LdorDH+FYQkoeARcM2V0sQ89kM36fArWaHWq/25EmNmQUW0MhLTcbqW1A==
+nkeys.js@1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/nkeys.js/-/nkeys.js-1.0.4.tgz#0902bd44129569c4bd3857ce87d8b69f1c0e7253"
+  integrity sha512-xeNDE6Ha5I3b3PnlHyT9AbmBxq3Vb9KHzmaI/h4IXYg0PUVZSUXNHNhTfU20oBsubw2ZdV/1AdC6hnRuMiZfMQ==
   dependencies:
-    "@types/node" "^14.0.26"
-    tweetnacl "^1.0.3"
+    tweetnacl "1.0.3"
 
 no-case@^3.0.4:
   version "3.0.4"
@@ -11850,15 +11850,15 @@ tunnel-agent@^0.6.0:
   dependencies:
     safe-buffer "^5.0.1"
 
+tweetnacl@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
+  integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
+
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
   integrity sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
-
-tweetnacl@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
-  integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
 twitter-api-v2@^1.10.0:
   version "1.11.3"
@@ -12253,6 +12253,11 @@ wcwidth@^1.0.1:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+web-streams-polyfill@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.2.1.tgz#71c2718c52b45fd49dbeee88634b3a60ceab42a6"
+  integrity sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
