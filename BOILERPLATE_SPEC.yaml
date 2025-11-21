@@ -1,0 +1,1972 @@
+# NestJS Boilerplate Specification
+# Version: 1.0.0
+# Last Updated: 2025-11-15
+# This specification serves as the source of truth for generating the NestJS boilerplate
+
+metadata:
+  name: 'NestJS Enterprise Boilerplate'
+  description: 'Production-ready NestJS boilerplate with authentication, database, and best practices'
+  version: '1.0.0'
+  author: 'Auto-generated from specification'
+  license: 'MIT'
+  engines:
+    node: '>= 22.0.0'
+
+# Core Dependencies - Always use latest compatible versions
+dependencies:
+  runtime:
+    nodejs: '>=22.0.0'
+    nestjs:
+      core: '^11.1.9'
+      platform_express: '^11.1.9'
+      config: '^4.0.2'
+      jwt: '^11.0.1'
+      passport: '^11.0.5'
+      swagger: '^11.2.1'
+      throttler: '^6.2.1'
+      bull: '^11.0.4'
+      typeorm: '^11.0.0'
+      websockets: '^11.1.9'
+      platform_socket_io: '^11.1.9'
+      cache_manager: '^3.0.1'
+      terminus: '^11.0.0'
+      axios: '^4.0.1'
+    mongodb:
+      nestjs_mongoose: '^10.1.0'
+      mongoose: '^8.0.0'
+    security:
+      bcrypt: '^5.1.1'
+      helmet: '^7.1.0'
+      class_validator: '^0.14.0'
+      class_transformer: '^0.5.1'
+    utilities:
+      reflect_metadata: '^0.2.2'
+      rxjs: '^7.8.1'
+      socket_io: '^4.8.1'
+      nodemailer: '^6.9.7'
+      bull: '^4.12.2'
+      ioredis: '^5.3.2'
+      cache_manager: '^6.1.0'
+      multer: '^1.4.5-lts.1'
+      aws_sdk: '^3.478.0'
+  dev:
+    typescript: '^5.3.0'
+    eslint: '^8.0.0'
+    prettier: '^3.0.0'
+    jest: '^29.0.0'
+    supertest: '^6.3.0'
+    husky: '^8.0.0'
+    types_mongoose: '^8.0.0'
+
+# TypeScript Configuration
+tsconfig:
+  compiler_options:
+    baseUrl: '.'
+    module: 'commonjs'
+    moduleResolution: 'node'
+    strict: true
+    noUnusedLocals: true
+    strictNullChecks: true
+    noImplicitAny: false
+    outDir: 'dist'
+    sourceMap: true
+    target: 'es6'
+    esModuleInterop: false
+    allowSyntheticDefaultImports: true
+    emitDecoratorMetadata: true
+    experimentalDecorators: true
+    lib: ['dom', 'es7']
+    declaration: false
+    removeComments: true
+    noLib: false
+    resolveJsonModule: true
+    incremental: true
+    skipLibCheck: true
+  path_aliases:
+    '@api/*': 'src/api/*'
+    '@common': 'src/common'
+    '@dynamodb': 'src/dynamodb'
+    '@entities': 'src/entities'
+    '@lib/*': 'src/lib/*'
+    '@models': 'src/models'
+    '@queries': 'src/queries'
+    '@repositories': 'src/repositories'
+    '@schemas': 'src/schemas'
+    '@events': 'src/events'
+  include:
+    - 'src/**/*'
+    - 'typings/**/*.ts'
+  exclude:
+    - 'node_modules'
+
+  build_config:
+    file: 'tsconfig.build.json'
+    extends: './tsconfig.json'
+    exclude:
+      - 'node_modules'
+      - 'test'
+      - 'dist'
+      - '**/*spec.ts'
+
+# Project Structure
+structure:
+  root:
+    - 'assets/' # Email templates, static data JSON files
+    - 'config/' # Third-party library configurations (Firebase, etc.)
+    - 'public/' # Publicly accessible static files
+    - 'src/' # Main business logic directory
+    - 'test/' # Test files
+    - 'docker/' # Docker configuration
+    - '.github/' # GitHub workflows
+
+  assets:
+    description: 'Contains any files for the app like email templates, static data JSON'
+    directories:
+      - templates/email
+      - data
+      - images
+
+  config:
+    description: 'Third-party library configurations'
+    files:
+      - firebase.config.ts
+      - aws.config.ts
+      - external-services.config.ts
+
+  public:
+    description: 'Publicly accessible files via HTTP'
+    directories:
+      - uploads
+      - static
+
+  src:
+    api:
+      description: 'API modules containing all business logic endpoints'
+      modules:
+        - auth
+        - users
+        - mail
+        - file
+        - health
+        - posts
+        - comments
+      structure: 'Each module contains: controller, service, dto, entity'
+
+    common:
+      description: 'Custom functions, utilities, and shared logic'
+      directories:
+        - decorators
+        - decorators/interfaces
+        - exceptions
+        - guards
+        - interceptors
+        - pagination
+        - responses
+        - swaggers
+        - utils
+        - types
+        - validators
+      root_files:
+        - index.ts # Barrel export file for all common modules
+
+    events:
+      description: 'WebSocket functionality and real-time features'
+      directories:
+        - gateways
+        - listeners
+        - adapters
+
+    lib:
+      description: 'Built-in modules and core functionality'
+      directories:
+        - database
+        - queue
+        - storage
+        - logger
+        - validation
+        - configs
+        - jwt
+        - i18next
+        - ioredis
+
+    schemas:
+      description: 'MongoDB schemas with Mongoose for data structure'
+      note: 'Pure MongoDB schemas without validation/API decorators, uses T namespace for enums'
+      files:
+        - base.schema.ts
+        - user.schema.ts
+        - todo.schema.ts
+        - index.ts
+
+    seed:
+      description: 'Seeding data models and fixtures'
+      files:
+        - user.seed.ts
+        - admin.seed.ts
+        - initial-data.seed.ts
+
+    root_files:
+      - app.module.ts # Main application module with all imports
+      - main.ts # Server configuration and startup with WebSocket Redis adapter
+      - seeder.ts # Seeder runner script
+
+# Features to Implement
+features:
+  authentication:
+    enabled: true
+    strategy: 'jwt'
+    features:
+      - local_login
+      - jwt_access_token
+      - jwt_refresh_token
+      - email_verification
+      - password_reset
+      - account_activation
+    token_expiry:
+      access: '15m'
+      refresh: '7d'
+      verification: '24h'
+
+  authorization:
+    enabled: true
+    type: 'rbac'
+    roles:
+      - SUPER_ADMIN
+      - ADMIN
+      - USER
+    permissions:
+      - CREATE
+      - READ
+      - UPDATE
+      - DELETE
+
+  database:
+    type: 'mongodb'
+    orm: 'mongoose'
+    features:
+      - schemas
+      - indexes
+      - virtuals
+      - middleware
+      - text_search
+      - audit_fields
+      - soft_delete
+      - timestamps
+    connection_pooling: true
+    ssl_enabled: true
+
+  api:
+    version: 'v1'
+    prefix: 'api'
+    documentation:
+      enabled: true
+      tool: 'swagger'
+      path: '/api/docs'
+    features:
+      - pagination
+      - filtering
+      - sorting
+      - search
+      - field_selection
+    rate_limiting:
+      enabled: true
+      ttl: 60
+      limit: 100
+
+  validation:
+    enabled: true
+    library: 'class-validator'
+    features:
+      - dto_validation
+      - transform_payloads
+      - whitelist_properties
+      - forbid_non_whitelisted
+
+  security:
+    cors:
+      enabled: true
+      origin: 'environment_based'
+    helmet:
+      enabled: true
+    csrf:
+      enabled: false # Typically disabled for REST APIs
+    rate_limiting:
+      enabled: true
+    input_sanitization:
+      enabled: true
+
+  logging:
+    enabled: true
+    library: 'winston'
+    levels:
+      - error
+      - warn
+      - info
+      - debug
+    transports:
+      - console
+      - file
+      - daily_rotate_file
+    features:
+      - request_logging
+      - error_logging
+      - performance_logging
+
+  caching:
+    enabled: true
+    provider: 'redis'
+    features:
+      - in_memory_fallback
+      - cache_manager
+      - custom_ttl
+
+  queues:
+    enabled: true
+    provider: 'bull'
+    queues:
+      - email
+      - file_processing
+      - notifications
+
+  file_upload:
+    enabled: true
+    storage:
+      - local
+      - s3
+    limits:
+      file_size: '10mb'
+      files_per_request: 5
+    allowed_types:
+      - 'image/jpeg'
+      - 'image/png'
+      - 'image/gif'
+      - 'application/pdf'
+
+  email:
+    enabled: true
+    provider: 'nodemailer'
+    templates:
+      - welcome
+      - email_verification
+      - password_reset
+      - password_changed
+    features:
+      - html_templates
+      - attachments
+      - queue_support
+
+  health_checks:
+    enabled: true
+    endpoints:
+      - '/health'
+      - '/health/database'
+      - '/health/redis'
+    checks:
+      - database_connection
+      - redis_connection
+      - disk_space
+      - memory_usage
+
+  monitoring:
+    enabled: true
+    features:
+      - request_duration
+      - error_tracking
+      - custom_metrics
+
+# Module Specifications
+# All modules live under src/api/ following the proposed structure
+modules:
+  auth:
+    location: 'src/api/auth'
+    description: 'Authentication and authorization module'
+    endpoints:
+      - method: POST
+        path: '/auth/register'
+        description: 'Register new user'
+        public: true
+      - method: POST
+        path: '/auth/login'
+        description: 'Login user'
+        public: true
+      - method: POST
+        path: '/auth/refresh'
+        description: 'Refresh access token'
+        public: true
+      - method: POST
+        path: '/auth/logout'
+        description: 'Logout user'
+        authenticated: true
+      - method: POST
+        path: '/auth/verify-email'
+        description: 'Verify email address'
+        public: true
+      - method: POST
+        path: '/auth/forgot-password'
+        description: 'Request password reset'
+        public: true
+      - method: POST
+        path: '/auth/reset-password'
+        description: 'Reset password'
+        public: true
+    entities:
+      - User
+      - RefreshToken
+    services:
+      - AuthService
+      - TokenService
+      - PasswordService
+
+  users:
+    location: 'src/api/users'
+    description: 'User management module'
+    endpoints:
+      - method: GET
+        path: '/users'
+        description: 'Get all users'
+        roles: [ADMIN, SUPER_ADMIN]
+      - method: GET
+        path: '/users/:id'
+        description: 'Get user by id'
+        authenticated: true
+      - method: GET
+        path: '/users/me'
+        description: 'Get current user profile'
+        authenticated: true
+      - method: PATCH
+        path: '/users/me'
+        description: 'Update current user profile'
+        authenticated: true
+      - method: DELETE
+        path: '/users/:id'
+        description: 'Delete user'
+        roles: [SUPER_ADMIN]
+    entities:
+      - User
+      - UserProfile
+    services:
+      - UsersService
+
+  mail:
+    location: 'src/api/mail'
+    description: 'Email service module'
+    features:
+      - send_email
+      - send_template_email
+      - queue_email
+    templates:
+      - welcome
+      - verification
+      - password_reset
+
+  file:
+    location: 'src/api/file'
+    description: 'File upload and management module'
+    endpoints:
+      - method: POST
+        path: '/files/upload'
+        description: 'Upload file'
+        authenticated: true
+      - method: GET
+        path: '/files/:id'
+        description: 'Get file'
+        authenticated: true
+      - method: DELETE
+        path: '/files/:id'
+        description: 'Delete file'
+        authenticated: true
+    entities:
+      - File
+    services:
+      - FileService
+      - StorageService
+
+  health:
+    location: 'src/api/health'
+    description: 'Health check module'
+    endpoints:
+      - method: GET
+        path: '/health'
+        description: 'Overall health check'
+        public: true
+      - method: GET
+        path: '/health/database'
+        description: 'Database health check'
+        public: true
+
+# Database Schema - MongoDB with Mongoose
+database_schema:
+  approach: 'MongoDB with Mongoose schemas'
+  note: 'Uses pure MongoDB schemas without validation/API decorators, enums via T namespace'
+  users:
+    collection_name: 'users'
+    schema_class: 'User'
+    extends: 'BaseCreation'
+    properties:
+      # Core identification
+      email:
+        type: 'String'
+        required: true
+        unique: true
+        lowercase: true
+        trim: true
+        match: '/^[^\s@]+@[^\s@]+\.[^\s@]+$/'
+        index: true
+      password:
+        type: 'String'
+        required: true
+        minlength: 8
+        select: false
+      
+      # Personal information
+      firstName:
+        type: 'String'
+        required: true
+        trim: true
+        minlength: 1
+        maxlength: 50
+        index: true
+      lastName:
+        type: 'String'
+        required: true
+        trim: true
+        minlength: 1
+        maxlength: 50
+        index: true
+      
+      # Authorization and status
+      role:
+        type: 'String'
+        enum: 'T.UserRole values'
+        default: 'T.UserRole.USER'
+        index: true
+      status:
+        type: 'String'
+        enum: 'T.UserStatus values'
+        default: 'T.UserStatus.PENDING_VERIFICATION'
+        index: true
+      isEmailVerified:
+        type: 'Boolean'
+        default: false
+        index: true
+      
+      # Authentication tokens
+      emailVerificationToken:
+        type: 'String'
+        select: false
+        index: true
+        sparse: true
+      passwordResetToken:
+        type: 'String'
+        select: false
+        index: true
+        sparse: true
+      passwordResetExpires:
+        type: 'Date'
+        select: false
+      lastLoginAt:
+        type: 'Date'
+        index: true
+      
+      # Profile information
+      avatar:
+        type: 'String'
+        trim: true
+      phoneNumber:
+        type: 'String'
+        trim: true
+        match: '/^\+[1-9]\d{1,14}$/'
+        index: true
+        sparse: true
+      dateOfBirth:
+        type: 'Date'
+      gender:
+        type: 'String'
+        enum: 'T.UserGender values'
+      bio:
+        type: 'String'
+        trim: true
+        maxlength: 500
+      timezone:
+        type: 'String'
+        trim: true
+        default: 'UTC'
+      language:
+        type: 'String'
+        trim: true
+        lowercase: true
+        default: 'en'
+        match: '/^[a-z]{2}$/'
+      preferences:
+        type: 'Mixed'
+        default: '{}'
+      loginCount:
+        type: 'Number'
+        default: 0
+        min: 0
+    indexes:
+      - columns: ['email']
+        unique: true
+      - columns: ['role', 'status']
+      - columns: ['status', 'isEmailVerified']
+      - columns: ['firstName', 'lastName']
+      - columns: ['phoneNumber']
+        sparse: true
+      - columns: ['createdAt']
+        sort: -1
+      - columns: ['lastLoginAt']
+        sort: -1
+      - columns: ['loginCount']
+        sort: -1
+      - type: 'text'
+        fields: ['firstName', 'lastName', 'email', 'bio']
+        weights: { firstName: 10, lastName: 10, email: 8, bio: 3 }
+    virtuals:
+      - 'fullName: string'
+      - 'initials: string'
+      - 'isAdmin: boolean'
+      - 'isActive: boolean'
+      - 'age: number | null'
+
+  todos:
+    collection_name: 'todos'
+    schema_class: 'Todo'
+    extends: 'BaseCreation'
+    properties:
+      # Core task information
+      title:
+        type: 'String'
+        required: true
+        trim: true
+        minlength: 1
+        maxlength: 200
+        index: true
+      description:
+        type: 'String'
+        trim: true
+        maxlength: 1000
+      
+      # Status and priority
+      status:
+        type: 'String'
+        enum: 'T.TodoStatus values'
+        default: 'T.TodoStatus.PENDING'
+        index: true
+      priority:
+        type: 'String'
+        enum: 'T.TodoPriority values'
+        default: 'T.TodoPriority.MEDIUM'
+        index: true
+      category:
+        type: 'String'
+        enum: 'T.TodoCategory values'
+        default: 'T.TodoCategory.OTHER'
+        index: true
+      
+      # Assignment and collaboration
+      assignedTo:
+        type: 'ObjectId'
+        ref: 'User'
+        required: true
+        index: true
+      collaborators:
+        type: '[ObjectId]'
+        ref: 'User'
+        default: '[]'
+        index: true
+      
+      # Scheduling
+      dueDate:
+        type: 'Date'
+        index: true
+      completedAt:
+        type: 'Date'
+        index: true
+      
+      # Time tracking
+      estimatedHours:
+        type: 'Number'
+        min: 0
+        max: 1000
+      actualHours:
+        type: 'Number'
+        min: 0
+        max: 1000
+      progress:
+        type: 'Number'
+        min: 0
+        max: 100
+        default: 0
+      
+      # Organization
+      tags:
+        type: '[String]'
+        default: '[]'
+        validate: 'max 10 tags, each max 30 chars'
+        index: true
+      isArchived:
+        type: 'Boolean'
+        default: false
+        index: true
+      parentId:
+        type: 'ObjectId'
+        ref: 'Todo'
+        index: true
+      notes:
+        type: 'String'
+        trim: true
+        maxlength: 500
+      metadata:
+        type: 'Mixed'
+        default: '{}'
+    indexes:
+      - columns: ['assignedTo']
+      - columns: ['status']
+      - columns: ['priority']
+      - columns: ['category']
+      - columns: ['dueDate']
+      - columns: ['completedAt']
+      - columns: ['isArchived']
+      - columns: ['parentId']
+      - columns: ['tags']
+      - columns: ['createdAt']
+        sort: -1
+      - type: 'text'
+        fields: ['title', 'description', 'notes']
+        weights: { title: 10, description: 5, notes: 3 }
+    virtuals:
+      - 'isOverdue: boolean'
+      - 'daysUntilDue: number | null'
+      - 'isHighPriority: boolean'
+      - 'efficiency: number | null'
+      - 'displayTitle: string'
+
+# Environment Variables Required
+environment:
+  required:
+    - NODE_ENV
+    - PORT
+    - API_PREFIX
+    - MONGODB_URI
+    - JWT_SECRET
+    - JWT_REFRESH_SECRET
+    - JWT_ACCESS_EXPIRATION
+    - JWT_REFRESH_EXPIRATION
+    - REDIS_HOST
+    - REDIS_PORT
+  optional:
+    - REDIS_AUTH_PASS
+    - MAIL_HOST
+    - MAIL_PORT
+    - MAIL_USER
+    - MAIL_PASSWORD
+    - MAIL_FROM
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+    - AWS_REGION
+    - AWS_S3_BUCKET
+    - CORS_ORIGIN
+    - RATE_LIMIT_TTL
+    - RATE_LIMIT_MAX
+
+# Testing Strategy
+testing:
+  unit_tests:
+    enabled: true
+    coverage_threshold: 80
+    frameworks:
+      - jest
+    patterns:
+      - '**/*.spec.ts'
+
+  integration_tests:
+    enabled: true
+    patterns:
+      - '**/*.integration-spec.ts'
+    database: 'test_database'
+
+  e2e_tests:
+    enabled: true
+    patterns:
+      - 'test/**/*.e2e-spec.ts'
+    setup:
+      - start_test_database
+      - run_migrations
+      - seed_data
+
+# DevOps
+devops:
+  docker:
+    enabled: true
+    services:
+      - app
+      - postgres
+      - redis
+    features:
+      - multi_stage_build
+      - docker_compose
+      - development_mode
+      - production_mode
+    dockerignore:
+      - '.git'
+      - '.vscode'
+      - '.dockerignore'
+      - '.gitignore'
+      - 'build'
+      - 'dist'
+      - 'node_modules'
+      - 'docker-compose.yaml'
+      - 'Dockerfile'
+      - 'README.md'
+
+  ci_cd:
+    enabled: true
+    platform: 'github_actions'
+    workflows:
+      - lint
+      - test
+      - build
+      - deploy
+
+  git_hooks:
+    enabled: true
+    pre_commit:
+      - lint
+      - format
+      - type_check
+    pre_push:
+      - test
+
+# Code Quality
+code_quality:
+  linting:
+    enabled: true
+    tool: 'eslint'
+    parser: '@typescript-eslint/parser'
+    parserOptions:
+      extraFileExtensions: ['.json', '.pug']
+      project: 'tsconfig.json'
+      sourceType: 'module'
+      ecmaVersion: 2018
+    plugins:
+      - '@typescript-eslint/eslint-plugin'
+    extends:
+      - 'plugin:@typescript-eslint/recommended'
+      - 'plugin:import/errors'
+      - 'plugin:import/typescript'
+      - 'prettier/@typescript-eslint'
+      - 'plugin:prettier/recommended'
+    rules:
+      no_console: 'off'
+      '@typescript-eslint/interface-name-prefix': 'off'
+      '@typescript-eslint/explicit-function-return-type': 'off'
+      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-unused-vars': 'off'
+      '@typescript-eslint/no-use-before-define': 'off'
+      '@typescript-eslint/no-non-null-assertion': 'off'
+      '@typescript-eslint/explicit-module-boundary-types': 'off'
+      '@typescript-eslint/ban-ts-comment': 'off'
+      'import/no-unresolved': 'off'
+      'import/order':
+        - 'error'
+        - newlines-between: 'always'
+          groups: [['builtin', 'external'], 'internal', ['parent', 'sibling', 'index']]
+          alphabetize:
+            order: 'asc'
+            caseInsensitive: true
+      'prettier/prettier':
+        - 'error'
+        - endOfLine: 'auto'
+      settings:
+        import/internal-regex: '^@api|@common|@events|@lib|@schemas/'  formatting:
+    enabled: true
+    tool: 'prettier'
+    config:
+      bracketSpacing: true
+      printWidth: 120
+      semi: true
+      singleQuote: true
+      tabWidth: 2
+      arrowParens: 'avoid'
+      trailingComma: 'none'
+      useTabs: false
+
+  type_checking:
+    enabled: true
+    strict: true
+
+  gitignore:
+    compiled_output:
+      - '/dist'
+      - '/node_modules'
+      - '/api_client'
+    logs:
+      - 'logs'
+      - '*.log'
+      - 'npm-debug.log*'
+      - 'yarn-debug.log*'
+      - 'yarn-error.log*'
+      - 'yarn.lock'
+    os:
+      - '.DS_Store'
+    tests:
+      - '/coverage'
+      - '/.nyc_output'
+    ide:
+      - '/.idea'
+      - '.project'
+      - '.classpath'
+      - '.c9/'
+      - '*.launch'
+      - '.settings/'
+      - '*.sublime-workspace'
+    vscode:
+      - '.vscode/*'
+      - '!.vscode/settings.json'
+      - '!.vscode/tasks.json'
+      - '!.vscode/launch.json'
+      - '!.vscode/extensions.json'
+    environment:
+      - '.env'
+    media:
+      - 'media/'
+      - 'config/*'
+      - 'public/*'
+      - 'uploads/temp'
+      - 'uploads/file'
+      - 'public/keys'
+      - 'public/uploads/*'
+      - 'assets/uploads/*'
+      - 'keys'
+      - 'build.sh'
+
+# Documentation
+documentation:
+  api:
+    enabled: true
+    tool: 'swagger'
+    features:
+      - auto_generated
+      - interactive_ui
+      - export_openapi_json
+
+  code:
+    enabled: true
+    requirements:
+      - jsdoc_comments
+      - readme_per_module
+
+  general:
+    files:
+      - README.md
+      - CONTRIBUTING.md
+      - CHANGELOG.md
+      - API.md
+      - DEPLOYMENT.md
+
+# VSCode Configuration
+vscode:
+  enabled: true
+  location: '.vscode'
+  files:
+    extensions.json:
+      recommendations:
+        - 'EditorConfig.EditorConfig'
+        - 'Tyriar.sort-lines'
+        - 'aaron-bond.better-comments'
+        - 'ionutvmi.path-autocomplete'
+        - 'abierbaum.vscode-file-peek'
+        - 'dbaeumer.vscode-eslint'
+        - 'eamodio.gitlens'
+        - 'esbenp.prettier-vscode'
+        - 'formulahendry.code-runner'
+        - 'kumar-harsh.graphql-for-vscode'
+        - 'mikestead.dotenv'
+        - 'steoates.autoimport'
+        - 'streetsidesoftware.code-spell-checker'
+        - 'vscode-icons-team.vscode-icons'
+        - 'xabikos.JavaScriptSnippets'
+    settings.json:
+      editor.formatOnSave: true
+      editor.tabSize: 2
+      git.autofetch: true
+      typescript.tsdk: 'node_modules/typescript/lib'
+      files.exclude:
+        - '**/.git'
+        - 'node_modules'
+        - 'dist'
+        - 'coverage'
+      search.exclude:
+        - '**/node_modules'
+        - '**/dist'
+      spell_check_words:
+        - 'apns'
+        - 'authen'
+        - 'backend'
+        - 'bycrypt'
+        - 'nestjs'
+        - 'mimetype'
+        - 'websockets'
+        - 'Injectable'
+        - 'Typegoose'
+        - 'Validators'
+
+  # Additional Configuration
+  websocket:
+    enabled: true
+    location: 'src/events'
+    features:
+      - real_time_notifications
+      - chat_functionality
+      - live_updates
+    gateways:
+      - notifications
+      - chat
+
+additional:
+  i18next_module:
+    enabled: true
+    location: 'src/lib/i18next'
+    description: 'I18next internationalization module with type-safe translations'
+    files:
+      constant:
+        file: 'i18next.constant.ts'
+        exports:
+          - 'I18NEXT_TOKEN = I18NEXT_INJECT_TOKEN'
+      converter:
+        file: 'i18next.converter.js'
+        description: 'Script to generate TypeScript types from locale JSON files'
+        command: 'node src/lib/i18next/i18next.converter.js'
+        features:
+          - generates_i18next_typing_ts
+          - generates_translate_enum
+          - reads_assets_locales
+      decorator:
+        file: 'i18next.decorator.ts'
+        exports:
+          - 'I18Next - Parameter decorator to extract i18n from request'
+      helper:
+        file: 'i18next.helper.ts'
+        description: 'Format functions for i18next interpolation'
+        exports:
+          - 'format - FormatFunction for strong text formatting'
+      provider:
+        file: 'i18next.provider.ts'
+        description: 'Factory provider for i18next instance'
+        features:
+          - http_adapter_integration
+          - i18next_lib_initialization
+      main:
+        file: 'i18next.ts'
+        description: 'I18NextLib class with i18next configuration'
+        features:
+          - filesystem_backend
+          - language_detector
+          - custom_format_function
+          - middleware_integration
+        config:
+          namespaces: ['translation']
+          default_language: 'en'
+          preload: ['en', 'zh']
+          fallback_language: 'en'
+          detection_order: ['header', 'querystring']
+          lookup_header: 'x-language'
+      typing:
+        file: 'i18next.typing.ts'
+        description: 'Auto-generated type definitions for translations'
+        note: 'Generated by i18next.converter.js'
+      module:
+        file: 'i18next.module.ts'
+        description: 'Global module exporting i18next provider'
+        features:
+          - global_module
+      index:
+        file: 'index.ts'
+        exports:
+          - I18NextModule
+          - I18Next
+          - i18next (type)
+          - i18n
+          - I18NextTranslate (from typing)
+
+  jwt_module:
+    enabled: true
+    location: 'src/lib/jwt'
+    description: 'JWT module for token generation and validation'
+    files:
+      constant:
+        file: 'jwt.constant.ts'
+        exports:
+          - 'JWT_TOKEN = JWT_INJECT_TOKEN'
+        note: 'Legacy - not used in service-based approach'
+      decorator:
+        file: 'jwt.decorator.ts'
+        exports:
+          - 'InjectJWT() - Inject decorator for JWT service'
+        description: 'Injects JwtService class directly'
+      dto:
+        file: 'jwt.dto.ts'
+        description: 'JWTConfig DTO with validation'
+        fields:
+          - 'JWT_SECRET! (required)'
+          - 'JWT_REFRESH_SECRET! (required)'
+          - 'JWT_ACCESS_EXPIRATION! (required)'
+          - 'JWT_REFRESH_EXPIRATION! (required)'
+      service:
+        file: 'jwt.service.ts'
+        class_name: 'JwtService'
+        description: 'Injectable JWT service with wrapper methods'
+        features:
+          - injectable_service
+          - config_service_validation
+          - nestjs_jwt_service_wrapper
+          - sign_verify_methods
+          - config_accessor
+        methods:
+          - 'sign(payload, options?): string'
+          - 'signAsync(payload, options?): Promise<string>'
+          - 'verify<T>(token, options?): T'
+          - 'verifyAsync<T>(token, options?): Promise<T>'
+          - 'decode(token, options?): any'
+          - 'getConfig(): JWTConfig'
+        validation: 'Uses ConfigService.validate() with JWTConfig'
+        note: 'Wraps @nestjs/jwt JwtService with alias to avoid naming conflict'
+      module:
+        file: 'jwt.module.ts'
+        description: 'Global module exporting JWT service'
+        features:
+          - global_module
+      index:
+        file: 'index.ts'
+        exports:
+          - InjectJWT
+          - JWTModule
+          - JwtService
+
+  ioredis_module:
+    enabled: true
+    location: 'src/lib/ioredis'
+    description: 'IORedis module for Redis client with PubSub support'
+    files:
+      constant:
+        file: 'ioredis.constant.ts'
+        exports:
+          - 'IOREDIS_TOKEN = IOREDIS_INJECT_TOKEN'
+          - 'IOREDIS_PUB_SUB_TOKEN = IOREDIS_PUB_SUB_INJECT_TOKEN'
+      decorator:
+        file: 'ioredis.decorator.ts'
+        exports:
+          - 'InjectIORedis() - Inject decorator for Redis client'
+          - 'InjectIORedisPubSub() - Inject decorator for Redis PubSub'
+      dto:
+        file: 'ioredis.dto.ts'
+        description: 'IORedisConfig DTO with validation'
+        fields:
+          - 'REDIS_HOST! (required)'
+          - 'REDIS_PORT! (required, transformed to number)'
+          - 'REDIS_AUTH_PASS! (optional)'
+      provider:
+        file: 'ioredis.provider.ts'
+        description: 'Factory providers for Redis client and PubSub'
+        features:
+          - singleton_pattern
+          - config_service_validation
+          - keyspace_notifications
+          - connection_lifecycle_logging
+          - pubsub_subscription
+        validation: 'Uses ConfigService.validate() with IORedisConfig'
+      module:
+        file: 'ioredis.module.ts'
+        description: 'Global module exporting Redis providers'
+        features:
+          - global_module
+          - dual_providers
+      index:
+        file: 'index.ts'
+        exports:
+          - InjectIORedis
+          - InjectIORedisPubSub
+          - IORedisModule
+
+  config_module:
+    enabled: true
+    location: 'src/lib/configs'
+    description: 'Configuration module with validation using class-validator'
+    files:
+      config_dto:
+        file: 'config.dto.ts'
+        description: 'Environment variables DTO with validation decorators'
+        environment_enum:
+          - Development
+          - Production
+          - Test
+          - Staging
+        validation_strategy: 'class-validator decorators'
+        convention: 'Required fields use !, Optional fields use ?'
+      config_service:
+        file: 'config.service.ts'
+        description: 'Service to validate and access environment variables'
+        features:
+          - validate_on_startup
+          - plainToClass_transformation
+          - error_logging
+          - type_safe_access
+      config_module:
+        file: 'config.module.ts'
+        description: 'Global module configuration'
+        features:
+          - global_module
+          - nestjs_config_integration
+          - auto_validation
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_exceptions:
+    enabled: true
+    location: 'src/common/exceptions'
+    description: 'Global exception filters for error handling'
+    files:
+      app_exception_filter:
+        file: 'app-exception-filter.ts'
+        class: 'AppExceptionFilter'
+        description: 'HTTP exception filter with i18next translation support'
+        features:
+          - i18next_translation
+          - error_code_support
+          - status_code_handling
+          - console_logging
+        catches: 'HttpException'
+
+  common_decorators:
+    enabled: true
+    location: 'src/common/decorators'
+    description: 'Custom parameter and method decorators'
+    files:
+      get_user:
+        file: 'get-user.decorator.ts'
+        description: 'Parameter decorator to extract user from request'
+        uses: 'IXAuthUser interface'
+      roles:
+        file: 'roles.decorator.ts'
+        description: 'Method decorator to set required roles metadata'
+      public:
+        file: 'public.decorator.ts'
+        description: 'Method decorator to mark routes as public'
+      interfaces:
+        location: 'interfaces/'
+        description: 'Shared interfaces for decorators'
+        files:
+          ixauth_user:
+            file: 'IXAuthUser.ts'
+            interface: 'IXAuthUser'
+            properties:
+              - 'fullName: string'
+              - 'id: number | string'
+              - 'roles: string[]'
+          index:
+            file: 'index.ts'
+            description: 'Barrel export for interfaces'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_guards:
+    enabled: true
+    location: 'src/common/guards'
+    description: 'Authentication and authorization guards'
+    files:
+      authenticate:
+        file: 'authenticate.guard.ts'
+        class: 'AuthenticateGuard'
+        decorator: 'Authenticate()'
+        description: 'Combined authentication and authorization guard with JWT verification'
+        features:
+          - jwt_token_verification
+          - public_route_support
+          - bearer_token_extraction
+          - user_payload_injection
+          - detailed_logging
+        dependencies:
+          - JwtService
+          - Reflector
+          - IXAuthUser
+          - IS_PUBLIC_KEY
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_interceptors:
+    enabled: true
+    location: 'src/common/interceptors'
+    description: 'HTTP interceptors for request/response transformation'
+    files:
+      logging_interceptor:
+        file: 'logging.interceptor.ts'
+        class: 'LoggingInterceptor'
+        description: 'Logs incoming requests and outgoing responses'
+        features:
+          - request_logging
+          - response_time_tracking
+          - method_url_logging
+      transform_interceptor:
+        file: 'transform.interceptor.ts'
+        class: 'TransformInterceptor'
+        description: 'Transforms response data structure'
+        features:
+          - response_wrapping
+          - data_transformation
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_pagination:
+    enabled: true
+    location: 'src/common/pagination'
+    description: 'Pagination utilities for managing input and output'
+    files:
+      class:
+        file: 'pagination.class.ts'
+        description: 'Pagination result classes and Swagger decorator'
+        classes:
+          - 'Pagination<PaginationObject> - Generic paginated result wrapper with message, data, and meta'
+          - 'PaginationResponse<T> - Swagger response model for documentation'
+        decorators:
+          - 'ApiPaginatedResponse<DataDto> - Custom Swagger decorator for paginated responses'
+        features:
+          - constructor_with_readonly_params
+          - swagger_extra_models
+          - dynamic_schema_generation
+      dto:
+        file: 'pagination.dto.ts'
+        description: 'Pagination input DTO with validation and transformation'
+        interfaces:
+          - 'IPaginationDto - Input DTO interface'
+        classes:
+          - 'PaginationDto - Implements IPaginationDto'
+        fields:
+          - 'limit: number (default: 10, min: 1, with @TransformToNumber)'
+          - 'page: number (default: 1, min: 1, with @TransformToNumber)'
+          - 'offset: number (default: 0, min: 0, with @TransformToNumber)'
+        computed:
+          - 'getOffset: number - Calculated as limit * (page - 1)'
+        decorators:
+          - '@ApiPropertyOptional'
+          - '@Min'
+          - '@TransformToNumber'
+      interface:
+        file: 'pagination.interface.ts'
+        description: 'Pagination interfaces with Swagger documentation'
+        interfaces:
+          - 'IPaginationOptions - Input options with limit and page'
+          - 'IPaginationMeta - Abstract class with metadata fields'
+        meta_fields:
+          - 'itemCount: number - Items on current page'
+          - 'totalItems: number - Total items across all pages'
+          - 'itemsPerPage: number - Requested items per page'
+          - 'totalPages: number - Total number of pages'
+          - 'currentPage: number - Current page number'
+          - 'hasNextPage: boolean - Indicator for next page'
+          - 'hasPrevPage: boolean - Indicator for previous page'
+          - 'prevPage: number | null - Previous page number'
+          - 'nextPage: number | null - Next page number'
+        features:
+          - swagger_response_property_decorators
+      helper:
+        file: 'pagination.ts'
+        description: 'Pagination helper function'
+        functions:
+          - 'paginate<T>(items, totalItems, currentPage, limit, custom?) - Creates Pagination instance'
+        features:
+          - auto_calculate_total_pages
+          - auto_calculate_navigation
+          - custom_override_support
+          - returns_pagination_instance
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_responses:
+    enabled: true
+    location: 'src/common/responses'
+    description: 'Success response utilities for non-paginated data'
+    files:
+      class:
+        file: 'response.class.ts'
+        description: 'Response wrapper classes and Swagger decorator'
+        classes:
+          - 'Response<DataObject> - Generic response wrapper with message, data, and meta'
+          - 'SuccessResponse<T> - Swagger response model for documentation'
+        decorators:
+          - 'ApiSuccessResponse<DataDto> - Custom Swagger decorator for success responses'
+        features:
+          - constructor_with_readonly_params
+          - swagger_extra_models
+          - dynamic_schema_generation
+          - optional_meta_field
+      interface:
+        file: 'response.interface.ts'
+        description: 'Response metadata interface'
+        classes:
+          - 'IMetaData - Abstract class for custom metadata'
+        note: 'TODO: add meta data based on your demand'
+      helper:
+        file: 'response.ts'
+        description: 'Response helper function'
+        functions:
+          - 'successResponse<T>(item, meta?) - Creates Response instance with success message'
+        features:
+          - default_success_message
+          - optional_metadata_support
+          - returns_response_instance
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_swaggers:
+    enabled: true
+    location: 'src/common/swaggers'
+    description: 'Custom Swagger UI configuration and plugins'
+    files:
+      config:
+        file: 'swagger.config.ts'
+        description: 'Swagger UI options configuration'
+        exports:
+          - 'swaggerOptions - Custom Swagger UI configuration object'
+        features:
+          - persist_authorization
+          - custom_model_expansion
+          - case_insensitive_filter
+          - custom_layout
+          - operations_sorter
+        plugins:
+          - CaseInsensitiveFilterPlugin
+          - CustomLayoutPlugin
+        references:
+          - 'https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md'
+      description:
+        file: 'swagger.description.ts'
+        description: 'API documentation overview markdown'
+        exports:
+          - 'swaggerDescription - Markdown string for API overview'
+        includes:
+          - authorization_info
+          - parameters_format
+          - request_response_format
+          - device_app_headers
+          - error_response_format
+          - success_response_format
+      plugin:
+        file: 'swagger.plugin.ts'
+        description: 'Custom Swagger UI plugins and extensions'
+        exports:
+          - 'operationsSorter - Sort operations by HTTP method and path'
+          - 'CaseInsensitiveFilterPlugin - Case-insensitive tag filtering'
+          - 'CustomLayoutPlugin - Custom layout with NestJS logo header'
+        features:
+          - method_order_sorting
+          - custom_header_with_logo
+          - react_without_jsx
+        references:
+          - 'https://github.com/swagger-api/swagger-ui/issues/4158'
+          - 'https://github.com/swagger-api/swagger-ui/issues/3876'
+          - 'https://github.com/swagger-api/swagger-ui/blob/master/docs/customization/custom-layout.md'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+
+  common_types:
+    enabled: true
+    location: 'src/common/types'
+    description: 'Centralized type definitions and enums with T namespace access'
+    files:
+      base:
+        file: 'base.ts'
+        description: 'Base utility types and tuple helper'
+        exports:
+          - 'Lit - Union type for literals'
+          - 'tuple - Helper function for creating tuple types'
+      enum:
+        file: 'enum.ts'
+        description: 'All application enums using TypeScript enum pattern'
+        exports:
+          - 'RoleEnum - Tuple of role values (legacy)'
+          - 'RoleType - Union type of roles (legacy)'
+          - 'StatusEnum - Tuple of status values (legacy)'
+          - 'StatusType - Union type of status (legacy)'
+          - 'UserRole - User role enum (USER, ADMIN, SUPER_ADMIN)'
+          - 'UserStatus - User status enum (ACTIVE, INACTIVE, SUSPENDED, PENDING_VERIFICATION)'
+          - 'UserGender - User gender enum (MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY)'
+          - 'TodoStatus - Todo status enum (PENDING, IN_PROGRESS, COMPLETED, CANCELLED, ON_HOLD)'
+          - 'TodoPriority - Todo priority enum (LOW, MEDIUM, HIGH, URGENT, CRITICAL)'
+          - 'TodoCategory - Todo category enum (PERSONAL, WORK, PROJECT, MEETING, RESEARCH, BUG_FIX, FEATURE, OTHER)'
+        note: 'Accessible via T namespace (T.UserRole, T.TodoStatus, etc.)'
+      translate:
+        file: 'translate.ts'
+        description: 'Auto-generated Translate enum from locale files'
+        note: 'Generated by i18next.converter.js'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file with T namespace pattern'
+        exports:
+          - 'T (namespace export) - All types accessible as T.EnumName'
+          - 'Translate - Direct export for translations'
+
+  common_validators:
+    enabled: true
+    location: 'src/common/validators'
+    description: 'Custom validators and transformation decorators'
+    files:
+      transform_to_number:
+        file: 'transform-to-number.decorator.ts'
+        description: 'Transform string query parameters to numbers'
+        decorator: 'TransformToNumber()'
+        features:
+          - uses_class_transformer
+          - handles_undefined_null_empty
+          - returns_original_if_invalid
+          - reusable_across_dtos
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+        exports:
+          - TransformToNumber
+
+  common_utils:
+    enabled: true
+    location: 'src/common/utils'
+    description: 'Utility functions for common operations'
+    files:
+      bcrypt_util:
+        file: 'bcrypt.util.ts'
+        description: 'Password hashing and verification utilities'
+        functions:
+          - 'createPassword(str: string): Promise<string> - Hash password with bcrypt (salt rounds: 11)'
+          - 'verifyPassword(str: string, hash: string): Promise<boolean> - Compare password with hash'
+        dependencies:
+          - bcryptjs
+        features:
+          - password_hashing
+          - password_verification
+          - salt_rounds_11
+      global_util:
+        file: 'global.util.ts'
+        description: 'Global utility functions'
+        functions:
+          - 'getDay(d: number): string - Get day name from day number (0-6)'
+        features:
+          - day_name_conversion
+          - zero_based_indexing
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+        exports:
+          - bcrypt.util
+          - global.util
+
+  common_main_index:
+    enabled: true
+    location: 'src/common'
+    description: 'Main barrel export file for all common modules with T namespace'
+    file: 'index.ts'
+    exports:
+      exceptions:
+        - AppExceptionFilter
+      types:
+        - 'T (namespace) - All enums accessible as T.EnumName (T.UserRole, T.TodoStatus, etc.)'
+        - 'Translate - Translation enum'
+      utils:
+        - 'UTIL (namespace) - All utilities'
+      guards:
+        - Authenticate
+        - AuthenticateGuard
+      decorators:
+        - GetUser
+        - Public
+        - Roles
+        - IXAuthUser
+      swaggers:
+        - swaggerOptions
+        - swaggerDescription
+        - operationsSorter
+        - CaseInsensitiveFilterPlugin
+        - CustomLayoutPlugin
+      interceptors:
+        - LoggingInterceptor
+        - TransformInterceptor
+      responses:
+        - Response
+        - IMetaData
+        - ApiSuccessResponse
+        - SuccessResponse
+        - successResponse
+      pagination:
+        - IPaginationMeta
+        - PaginationDto
+        - IPaginationDto
+        - Pagination
+        - paginate
+        - ApiPaginatedResponse
+        - PaginationResponse
+      validators:
+        - TransformToNumber
+    note: 'Enums are no longer exported directly, only available through T namespace'
+
+  seed_data:
+    enabled: true
+    location: 'src/seed'
+    data:
+      - super_admin_user
+      - sample_users
+    seeder_command: 'ts-node src/seeder.ts'
+
+  email_templates:
+    enabled: true
+    location: 'assets/templates/email'
+    engine: 'handlebars'
+    templates:
+      - welcome
+      - verification
+      - password_rese
+      - password_changed
+
+  nest_cli:
+    enabled: true
+    location: 'nest-cli.json'
+    config:
+      collection: '@nestjs/schematics'
+      sourceRoot: 'src'
+      compilerOptions:
+        plugins:
+          - name: '@nestjs/swagger'
+            options:
+              introspectComments: true
+              dtoFileNameSuffix:
+                - '.dto.ts'
+                - '.schema.ts'
+                - '.class.ts'
+
+  scripts:
+    - name: 'dev'
+      command: 'nest start --watch'
+    - name: 'build'
+      command: 'nest build'
+    - name: 'start:prod'
+      command: 'node dist/main'
+    - name: 'migration:generate'
+      command: 'typeorm migration:generate'
+    - name: 'migration:run'
+      command: 'typeorm migration:run'
+    - name: 'seed'
+      command: 'ts-node src/seeder.ts'
+    - name: 'test'
+      command: 'jest'
+    - name: 'test:watch'
+      command: 'jest --watch'
+    - name: 'test:cov'
+      command: 'jest --coverage'
+    - name: 'test:e2e'
+      command: 'jest --config ./test/jest-e2e.json'
+
+  events_module:
+    enabled: true
+    location: 'src/events'
+    description: 'WebSocket events module for real-time communication'
+    files:
+      events_module:
+        file: 'events.module.ts'
+        class: 'EventsModule'
+        description: 'Module for WebSocket events functionality'
+        providers:
+          - EventGateway
+      events_gateway:
+        file: 'events.gateway.ts'
+        class: 'EventGateway'
+        description: 'WebSocket gateway for handling real-time events'
+        features:
+          - websocket_server
+          - connection_handling
+          - message_broadcasting
+          - room_management
+        decorators:
+          - '@WebSocketGateway'
+          - '@UseFilters(ExceptionFilter)'
+        methods:
+          - 'handleConnection(socket: Socket): void'
+          - 'handleDisconnect(socket: Socket): Promise<void>'
+          - 'handleMessage(client: Socket, payload: string): void'
+          - 'onJoinPersonalRoom(client: Socket, roomId: string): void'
+          - 'emit(eventName: string, body: any): void'
+          - 'broadcast(roomId: string, eventName: string, body: any): void'
+      events_filter:
+        file: 'events.filter.ts'
+        class: 'ExceptionFilter'
+        description: 'WebSocket exception filter for error handling'
+        features:
+          - websocket_exception_handling
+          - error_response_formatting
+        extends: 'BaseWsExceptionFilter'
+        catches: 'WsException'
+      events_guard:
+        file: 'events.guard.ts'
+        class: 'EventGuard'
+        description: 'WebSocket guard for authentication'
+        features:
+          - token_validation
+          - websocket_authentication
+        implements: 'CanActivate'
+      redis_io_adapter:
+        file: 'redis-io.adapter.ts'
+        class: 'RedisIoAdapter'
+        description: 'Redis adapter for Socket.IO with Redis PubSub'
+        features:
+          - redis_pubsub_integration
+          - socket_io_adapter
+          - connection_management
+        extends: 'IoAdapter'
+        methods:
+          - 'connectToRedis(): Promise<void>'
+          - 'createIOServer(port: number, options?: any): any'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file for events module'
+        exports:
+          - EventsModule
+          - EventGateway
+          - ExceptionFilter
+          - EventGuard
+          - RedisIoAdapter
+
+  main_application:
+    enabled: true
+    location: 'src/main.ts'
+    description: 'Main application bootstrap with WebSocket Redis adapter setup'
+    features:
+      - nest_application_factory
+      - global_validation_pipe
+      - cors_configuration
+      - helmet_security
+      - swagger_documentation
+      - websocket_redis_adapter
+      - environment_based_configuration
+    websocket_setup:
+      - redis_io_adapter_configuration
+      - connect_to_redis_before_listen
+      - use_redis_adapter_for_socketio
+    bootstrap_sequence:
+      - create_nest_application
+      - get_config_service
+      - set_global_prefix
+      - enable_versioning
+      - configure_security_helmet
+      - configure_cors
+      - setup_global_validation_pipe
+      - setup_swagger_documentation
+      - configure_redis_io_adapter
+      - connect_redis_adapter
+      - start_server_listening
+      required_imports:
+        - '@events/redis-io.adapter'
+        - '@lib/configs/config.service'
+
+  schemas_module:
+    enabled: true
+    location: 'src/schemas'
+    description: 'MongoDB schemas with Mongoose for data structure and business logic'
+    approach: 'Pure MongoDB schemas without validation/API decorators'
+    namespace_usage: 'Uses T namespace for enums (T.UserRole, T.TodoStatus, etc.)'
+    files:
+      base_schema:
+        file: 'base.schema.ts'
+        class: 'BaseCreation'
+        description: 'Base schema class with MongoDB audit fields'
+        features:
+          - audit_fields
+          - mongodb_objectid_references
+          - creation_tracking
+          - update_tracking
+          - user_tracking
+        properties:
+          - 'createdAt?: Date - Auto-generated timestamp when record was created'
+          - 'updatedAt?: Date - Auto-generated timestamp when record was last updated'
+          - 'createdBy?: Types.ObjectId - User ObjectId who created the record'
+          - 'updatedBy?: Types.ObjectId - User ObjectId who last updated the record'
+        decorators:
+          - '@Prop() - Mongoose property decorator for optional audit fields'
+        dependencies:
+          - '@nestjs/mongoose'
+          - 'mongoose'
+        note: 'Base class to be extended by all other schema classes'
+      user_schema:
+        file: 'user.schema.ts'
+        class: 'User'
+        description: 'Comprehensive user schema with authentication, profiles, and enterprise features'
+        extends: 'BaseCreation'
+        database: 'MongoDB with Mongoose'
+        features:
+          - user_authentication
+          - role_based_access_control
+          - email_verification
+          - password_reset_tokens
+          - user_status_management
+          - user_profiles_and_preferences
+          - virtual_properties
+          - comprehensive_indexes
+          - text_search
+          - json_transformation
+          - static_methods
+          - instance_methods
+        enums:
+          - 'T.UserRole: USER, ADMIN, SUPER_ADMIN'
+          - 'T.UserStatus: ACTIVE, INACTIVE, SUSPENDED, PENDING_VERIFICATION'
+          - 'T.UserGender: MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY'
+        core_properties:
+          - 'email!: string - Unique user email with validation regex (required, indexed)'
+          - 'password!: string - Hashed password (required, not selected, min 8 chars)'
+          - 'firstName!: string - User first name (required, indexed)'
+          - 'lastName!: string - User last name (required, indexed)'
+          - 'role!: T.UserRole - User role (default: USER, indexed)'
+          - 'status!: T.UserStatus - Account status (default: PENDING_VERIFICATION, indexed)'
+          - 'isEmailVerified!: boolean - Email verification status (default: false, indexed)'
+        auth_properties:
+          - 'emailVerificationToken?: string - Token for email verification (not selected, sparse index)'
+          - 'passwordResetToken?: string - Token for password reset (not selected, sparse index)'
+          - 'passwordResetExpires?: Date - Password reset token expiration (not selected)'
+          - 'lastLoginAt?: Date - Last login timestamp (indexed)'
+        profile_properties:
+          - 'avatar?: string - User avatar URL'
+          - 'phoneNumber?: string - Phone number with international format validation (sparse index)'
+          - 'dateOfBirth?: Date - User date of birth'
+          - 'gender?: T.UserGender - User gender'
+          - 'bio?: string - User bio/description (max 500 chars)'
+          - 'timezone?: string - User timezone (default: UTC)'
+          - 'language?: string - User language preference (default: en, 2-char code)'
+          - 'preferences?: Record<string, any> - User preferences object (default: {})'
+          - 'loginCount?: number - Number of successful logins (default: 0, min: 0)'
+        virtual_properties:
+          - 'fullName: string - Computed full name (firstName + lastName)'
+          - 'initials: string - User initials (first letters of first and last name)'
+          - 'isAdmin: boolean - Whether user has admin or super admin role'
+          - 'isActive: boolean - Whether user is active and email verified'
+          - 'age: number | null - Calculated age based on date of birth'
+        indexes:
+          - 'email (unique)'
+          - 'role + status (compound)'
+          - 'status + isEmailVerified (compound)'
+          - 'firstName + lastName (compound)'
+          - 'phoneNumber (sparse)'
+          - 'createdAt (desc)'
+          - 'lastLoginAt (desc)'
+          - 'loginCount (desc)'
+          - 'text search on firstName, lastName, email, bio with weights'
+        static_methods:
+          - 'findByRole(role: T.UserRole): Query'
+          - 'findActiveUsers(): Query'
+          - 'searchByText(searchText: string, limit?: number): Query'
+        json_transform:
+          - 'Excludes password, tokens, and sensitive fields'
+          - 'Transforms ObjectIds to strings'
+          - 'Includes virtual properties'
+        collection: 'users'
+        timestamps: true
+      todo_schema:
+        file: 'todo.schema.ts'
+        class: 'Todo'
+        description: 'Advanced todo/task management schema with collaboration, time tracking, and project management features'
+        extends: 'BaseCreation'
+        database: 'MongoDB with Mongoose'
+        features:
+          - task_management
+          - status_and_priority_tracking
+          - user_assignment_and_collaboration
+          - time_estimation_and_tracking
+          - progress_tracking
+          - due_date_management
+          - tagging_system
+          - archival_system
+          - hierarchical_tasks
+          - metadata_support
+          - virtual_properties
+          - pre_save_middleware
+          - comprehensive_indexes
+          - text_search
+          - static_methods
+          - instance_methods
+          - aggregation_stats
+        enums:
+          - 'T.TodoStatus: PENDING, IN_PROGRESS, COMPLETED, CANCELLED, ON_HOLD'
+          - 'T.TodoPriority: LOW, MEDIUM, HIGH, URGENT, CRITICAL'
+          - 'T.TodoCategory: PERSONAL, WORK, PROJECT, MEETING, RESEARCH, BUG_FIX, FEATURE, OTHER'
+        core_properties:
+          - 'title!: string - Task title (required, 1-200 chars, indexed)'
+          - 'description?: string - Task description (max 1000 chars)'
+          - 'status!: T.TodoStatus - Task status (default: PENDING, indexed)'
+          - 'priority!: T.TodoPriority - Task priority (default: MEDIUM, indexed)'
+          - 'category!: T.TodoCategory - Task category (default: OTHER, indexed)'
+          - 'assignedTo!: Types.ObjectId - Primary assigned user (required, indexed)'
+          - 'collaborators?: Types.ObjectId[] - Additional assigned users (default: [], indexed)'
+        scheduling_properties:
+          - 'dueDate?: Date - Task due date (indexed)'
+          - 'completedAt?: Date - Completion timestamp (indexed)'
+          - 'estimatedHours?: number - Estimated hours to complete (0-1000)'
+          - 'actualHours?: number - Actual hours spent (0-1000)'
+          - 'progress?: number - Progress percentage (0-100, default: 0)'
+        organization_properties:
+          - 'tags?: string[] - Task tags for categorization (max 10 tags, max 30 chars each, indexed)'
+          - 'isArchived!: boolean - Archive status (default: false, indexed)'
+          - 'parentId?: Types.ObjectId - Parent todo for subtasks (indexed)'
+          - 'notes?: string - Additional notes (max 500 chars)'
+          - 'metadata?: Record<string, any> - Custom metadata (default: {})'
+        virtual_properties:
+          - 'isOverdue: boolean - Whether task is overdue based on dueDate'
+          - 'daysUntilDue: number | null - Days until due date (negative if overdue)'
+          - 'isHighPriority: boolean - Whether priority is HIGH, URGENT, or CRITICAL'
+          - 'efficiency: number | null - Time efficiency ratio (estimated/actual hours)'
+          - 'displayTitle: string - Title with progress percentage'
+        indexes:
+          - 'assignedTo'
+          - 'status'
+          - 'priority'
+          - 'category'
+          - 'dueDate'
+          - 'completedAt'
+          - 'isArchived'
+          - 'parentId'
+          - 'tags'
+          - 'createdAt (desc)'
+          - 'text search on title, description, notes with weights'
+        middleware:
+          - 'pre-save: Auto-set completedAt when status changes to COMPLETED'
+          - 'pre-save: Auto-update progress based on status changes'
+          - 'pre-save: Business rule validations'
+        static_methods:
+          - 'findByUser(userId: Types.ObjectId, includeCollaborations?: boolean): Query'
+          - 'findOverdue(): Query'
+          - 'findByPriority(priority: T.TodoPriority): Query'
+          - 'findByCategory(category: T.TodoCategory): Query'
+          - 'searchByText(searchText: string, limit?: number): Query'
+          - 'getStats(userId?: Types.ObjectId): Aggregation - Returns completion stats and metrics'
+        instance_methods:
+          - 'addCollaborator(userId: Types.ObjectId): Promise<Todo>'
+          - 'removeCollaborator(userId: Types.ObjectId): Promise<Todo>'
+          - 'updateProgress(progress: number): Promise<Todo>'
+          - 'archive(): Promise<Todo>'
+          - 'unarchive(): Promise<Todo>'
+        json_transform:
+          - 'Transforms ObjectIds to strings for API responses'
+          - 'Includes virtual properties'
+          - 'Removes internal MongoDB fields'
+        collection: 'todos'
+        timestamps: true
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file for all schemas'
+        exports:
+          - 'BaseCreation - Base audit schema class'
+          - 'User - User schema class'
+          - 'UserDocument - User document type'
+          - 'UserSchema - User Mongoose schema'
+          - 'Todo - Todo schema class'
+          - 'TodoDocument - Todo document type'
+          - 'TodoSchema - Todo Mongoose schema'
+        note: 'Enums are accessed via T namespace from @common (T.UserRole, T.TodoStatus, etc.)'

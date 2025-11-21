@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "Tyriar.sort-lines",
+    "aaron-bond.better-comments",
+    "ionutvmi.path-autocomplete",
+    "abierbaum.vscode-file-peek",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "formulahendry.code-runner",
+    "kumar-harsh.graphql-for-vscode",
+    "mikestead.dotenv",
+    "steoates.autoimport",
+    "streetsidesoftware.code-spell-checker",
+    "vscode-icons-team.vscode-icons",
+    "xabikos.JavaScriptSnippets"
+  ]
+}

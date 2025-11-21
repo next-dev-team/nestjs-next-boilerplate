@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "outDir": "dist",
+    "sourceMap": true,
+    "target": "es6",
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["dom", "es7"],
+    "declaration": false,
+    "removeComments": true,
+    "noLib": false,
+    "resolveJsonModule": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@api/*": ["src/api/*"],
+      "@common": ["src/common"],
+      "@dynamodb": ["src/dynamodb"],
+      "@entities": ["src/entities"],
+      "@lib/*": ["src/lib/*"],
+      "@models": ["src/models"],
+      "@queries": ["src/queries"],
+      "@repositories": ["src/repositories"],
+      "@schemas": ["src/schema"],
+      "@dataloaders": ["src/dataloaders"],
+      "@events": ["src/events"]
+    }
+  },
+  "include": ["src/**/*", "typings/**/*.ts"],
+  "exclude": ["node_modules"]
+}

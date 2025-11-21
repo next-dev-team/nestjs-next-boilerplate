@@ -1,0 +1,9 @@
+import * as Bcrypt from 'bcryptjs';
+
+export const createPassword = async (str: string) => {
+  return await Bcrypt.hash(str, 11);
+};
+
+export const verifyPassword = async (str: string, hash: string): Promise<boolean> => {
+  return await Bcrypt.compare(str, hash);
+};
