@@ -1,32 +1,21 @@
 import { Global, Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigService } from '@nestjs/config';
+import { MongooseModule as _MongooseModule } from '@nestjs/mongoose';
+import * as schemas from '../../schemas';
 
-import { User, UserSchema, Todo, TodoSchema } from '../../schemas';
-import { MongooseService } from './mongoose.service';
+import { MongooseProvider } from './mongoose.provider';
 
 @Global()
 @Module({
   imports: [
-    MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-        retryWrites: true,
-        w: 'majority',
-        autoIndex: true,
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-        bufferCommands: false,
-        bufferMaxEntries: 0
-      }),
-      inject: [ConfigService]
-    }),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Todo.name, schema: TodoSchema }
+    _MongooseModule.forRootAsync({ useClass: MongooseProvider }),
+    _MongooseModule.forFeature([
+      ...(Object.keys(schemas)
+        .filter(v => !v.includes('Schema') && !v.includes('Document') && !v.includes('Model') && v !== 'BaseCreation')
+        .map(ele => ({ name: schemas[ele].name, schema: schemas[`${ele}Schema`] }))
+        .filter(v => v.schema) as { name: string; schema: any }[])
     ])
   ],
-  providers: [MongooseService],
-  exports: [MongooseModule, MongooseService]
+  providers: [],
+  exports: [_MongooseModule]
 })
-export class MongooseGlobalModule {}
+export class MongooseModule {}

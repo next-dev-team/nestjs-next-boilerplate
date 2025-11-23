@@ -179,7 +179,9 @@ structure:
     lib:
       description: 'Built-in modules and core functionality'
       directories:
-        - database
+        - mongoose
+        - rabbitmq
+        - throttler
         - queue
         - storage
         - logger
@@ -747,7 +749,8 @@ environment:
     - NODE_ENV
     - PORT
     - API_PREFIX
-    - MONGODB_URI
+    - MONGO_DB_URI
+    - RABBIT_MQ_HOST
     - JWT_SECRET
     - JWT_REFRESH_SECRET
     - JWT_ACCESS_EXPIRATION
@@ -1187,6 +1190,212 @@ additional:
           - InjectIORedis
           - InjectIORedisPubSub
           - IORedisModule
+
+  mongoose_module:
+    enabled: true
+    location: 'src/lib/mongoose'
+    description: 'Global Mongoose module with dynamic schema registration'
+    files:
+      mongoose_dto:
+        file: 'mongoose.dto.ts'
+        description: 'Mongoose configuration DTO with validation'
+        class: 'MongooseConfig'
+        fields:
+          - 'MONGO_DB_URI!: string - MongoDB connection URI (required)'
+        validation: 'class-validator decorators (@IsString, @IsNotEmpty)'
+      mongoose_provider:
+        file: 'mongoose.provider.ts'
+        class: 'MongooseProvider'
+        description: 'MongooseOptionsFactory implementation for connection configuration'
+        implements: 'MongooseOptionsFactory'
+        features:
+          - config_service_validation
+          - minimal_configuration
+          - injectable_service
+        methods:
+          - 'createMongooseOptions(): MongooseModuleOptions - Returns connection config'
+        validation: 'Uses ConfigService.validate() with MongooseConfig DTO'
+        dependencies:
+          - ConfigService from @lib/configs
+        note: 'Uses minimal configuration with just URI, leveraging Mongoose 8.0 defaults'
+      mongoose_module:
+        file: 'mongoose.module.ts'
+        class: 'MongooseModule'
+        description: 'Global module with dynamic schema registration'
+        decorators:
+          - '@Global() - Available app-wide without imports'
+        features:
+          - dynamic_schema_registration
+          - auto_discovery_pattern
+          - provider_factory_pattern
+          - mongoose_alias_import
+        imports:
+          - 'MongooseModule.forRootAsync({ useClass: MongooseProvider })'
+          - 'MongooseModule.forFeature([...dynamically discovered schemas])'
+        schema_discovery:
+          pattern: 'Object.keys(schemas).filter(...).map(...).filter(v => v.schema)'
+          filters:
+            - 'Excludes keys with "Schema" suffix'
+            - 'Excludes keys with "Document" suffix'
+            - 'Excludes keys with "Model" suffix'
+            - 'Excludes "BaseCreation"'
+          mapping: 'Maps class name to { name: Class.name, schema: ClassSchema }'
+        exports:
+          - '_MongooseModule - Aliased @nestjs/mongoose module'
+        note: 'Auto-discovers all schemas from src/schemas without manual registration'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+        exports:
+          - MongooseConfig
+          - MongooseModule
+          - MongooseProvider
+
+  rabbitmq_module:
+    enabled: true
+    location: 'src/lib/rabbitmq'
+    description: 'Global RabbitMQ module for message queue functionality'
+    dependencies:
+      - 'amqplib - RabbitMQ client library'
+      - '@types/amqplib - TypeScript type definitions'
+    files:
+      rabbitmq_constant:
+        file: 'rabbitmq.constant.ts'
+        exports:
+          - 'RABBIT_MQ_TOKEN - Injection token for RabbitMQ connection'
+      rabbitmq_decorator:
+        file: 'rabbitmq.decorator.ts'
+        exports:
+          - 'InjectRabbitMQ() - Inject decorator for RabbitMQ connection'
+        description: 'Injects RabbitMQ Connection instance'
+      rabbitmq_dto:
+        file: 'rabbitmq.dto.ts'
+        description: 'RabbitMQ configuration DTO with validation'
+        class: 'RabbitMqConfig'
+        fields:
+          - 'RABBIT_MQ_HOST!: string - RabbitMQ connection URL (required)'
+        validation: 'class-validator decorators (@IsString, @IsNotEmpty)'
+        connection_format: 'amqp://user:password@host:port'
+        note: 'Single connection string approach for simplicity'
+      rabbitmq_provider:
+        file: 'rabbitmq.provider.ts'
+        description: 'Factory provider for RabbitMQ connection with singleton pattern and retry mechanism'
+        exports:
+          - 'RabbitMqProvider - Factory provider object'
+        features:
+          - singleton_connection
+          - config_service_validation
+          - connection_lifecycle_logging
+          - amqplib_integration
+          - automatic_retry_on_failure
+          - automatic_reconnection
+          - connection_state_management
+        retry_config:
+          max_retry: 5
+          retry_delay: 5000ms
+        connection_handling:
+          - 'error event: Resets connection and marks as disconnected'
+          - 'close event: Automatically attempts reconnection after delay'
+          - 'Prevents concurrent connection attempts with isConnecting flag'
+          - 'Waits for ongoing connection if multiple requests occur'
+        validation: 'Uses ConfigService.validate() with RabbitMqConfig DTO'
+        dependencies:
+          - ConfigService from @lib/configs
+        note: 'Maintains single connection instance across application with resilient reconnection on failure'
+      rabbitmq_service:
+        file: 'rabbitmq.service.ts'
+        class: 'RabbitMQService'
+        description: 'Injectable RabbitMQ service with queue and exchange operations'
+        features:
+          - singleton_channel_pattern
+          - automatic_retry_mechanism
+          - queue_operations
+          - exchange_operations
+          - error_handling_and_logging
+          - message_persistence
+        queue_methods:
+          - 'sendToQueue(messageKey, messagePayload): Promise<boolean> - Send message to queue'
+          - 'consumeQueue(queueName, callback, options?): Promise<void> - Consume messages from queue'
+        exchange_methods:
+          - 'publishToExchange(exchangeName, routingKey, message, exchangeType?): Promise<boolean> - Publish to exchange'
+          - 'subscribeToExchange(exchangeName, routingKey, callback, exchangeType?, options?): Promise<void> - Subscribe to exchange'
+        helper_methods:
+          - 'getChannel(): Promise<Channel> - Get or create channel instance'
+        config:
+          retry_count: 5
+          prefetch_default: 1
+          durable_queues: true
+          persistent_messages: true
+        exchange_types:
+          - direct
+          - topic
+          - fanout
+          - headers
+        note: 'Channel is singleton per service instance, automatic retry on channel close'
+      rabbitmq_module:
+        file: 'rabbitmq.module.ts'
+        class: 'RabbitMQModule'
+        description: 'Global module exporting RabbitMQ providers and service'
+        decorators:
+          - '@Global() - Available app-wide without imports'
+        providers:
+          - RabbitMqProvider
+          - RabbitMQService
+        exports:
+          - RabbitMqProvider
+          - RabbitMQService
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+        exports:
+          - InjectRabbitMQ
+          - RabbitMQModule
+          - RabbitMQService
+          - RabbitMqConfig
+
+  throttler_module:
+    enabled: true
+    location: 'src/lib/throttler'
+    description: 'Global Throttler module for rate limiting with validation'
+    dependencies:
+      - '@nestjs/throttler - NestJS rate limiting module'
+    files:
+      throttler_dto:
+        file: 'throttler.dto.ts'
+        description: 'Throttler configuration DTO with validation'
+        class: 'ThrottlerConfig'
+        fields:
+          - 'RATE_LIMIT_TTL!: number - Time to live in seconds (required, min: 1, auto-transformed from string)'
+          - 'RATE_LIMIT_MAX!: number - Maximum requests per TTL (required, min: 1, auto-transformed from string)'
+        validation: 'class-validator decorators (@IsNumber, @Min, @IsNotEmpty) with @Transform'
+        note: 'Automatically converts string env variables to numbers'
+      throttler_module:
+        file: 'throttler.module.ts'
+        class: 'ThrottlerModule'
+        description: 'Global module wrapping @nestjs/throttler with configuration validation'
+        decorators:
+          - '@Global() - Available app-wide without imports'
+        features:
+          - config_service_validation
+          - async_configuration
+          - ttl_conversion_to_milliseconds
+          - nestjs_throttler_wrapper
+        imports:
+          - 'ThrottlerModule.forRootAsync() with factory pattern'
+        configuration:
+          - 'TTL converted from seconds to milliseconds'
+          - 'Uses ConfigService.validate() with ThrottlerConfig'
+        exports:
+          - '_ThrottlerModule - Aliased @nestjs/throttler module'
+        dependencies:
+          - ConfigService from @lib/configs
+        note: 'Wraps @nestjs/throttler with validation and converts TTL to milliseconds'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+        exports:
+          - ThrottlerModule
+          - ThrottlerConfig
 
   config_module:
     enabled: true

@@ -10,7 +10,7 @@ export class UserSeeder {
 
     // Check if super admin already exists
     const existingSuperAdmin = await userRepository.findOne({
-      where: { email: 'admin@example.com' },
+      where: { email: 'admin@example.com' }
     });
 
     if (!existingSuperAdmin) {
@@ -21,7 +21,7 @@ export class UserSeeder {
         lastName: 'Admin',
         role: UserRole.SUPER_ADMIN,
         isActive: true,
-        isEmailVerified: true,
+        isEmailVerified: true
       });
 
       await userRepository.save(superAdmin);
@@ -30,7 +30,7 @@ export class UserSeeder {
 
     // Check if test user exists
     const existingUser = await userRepository.findOne({
-      where: { email: 'user@example.com' },
+      where: { email: 'user@example.com' }
     });
 
     if (!existingUser) {
@@ -41,7 +41,7 @@ export class UserSeeder {
         lastName: 'User',
         role: UserRole.USER,
         isActive: true,
-        isEmailVerified: true,
+        isEmailVerified: true
       });
 
       await userRepository.save(user);

@@ -47,17 +47,20 @@ Production-ready NestJS boilerplate with authentication, database, WebSocket, an
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd nestjs-boilerplate
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Copy environment file:
+
 ```bash
 cp .env.example .env
 ```
@@ -65,11 +68,13 @@ cp .env.example .env
 4. Update `.env` with your configuration
 
 5. Run database migrations:
+
 ```bash
 npm run migration:run
 ```
 
 6. Seed the database:
+
 ```bash
 npm run seed
 ```
@@ -77,17 +82,20 @@ npm run seed
 ## Running the Application
 
 ### Development
+
 ```bash
 npm run dev
 ```
 
 ### Production
+
 ```bash
 npm run build
 npm run start:prod
 ```
 
 ### Docker
+
 ```bash
 docker-compose up
 ```

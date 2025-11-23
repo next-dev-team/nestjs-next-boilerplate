@@ -1,2 +1,3 @@
+export * from './mongoose.dto';
 export * from './mongoose.module';
-export * from './mongoose.service';
+export * from './mongoose.provider';

@@ -1,0 +1,1 @@
+export const RABBIT_MQ_TOKEN = 'RABBIT_MQ_INJECT_TOKEN';
