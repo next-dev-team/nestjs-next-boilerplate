@@ -7,7 +7,7 @@ import { User } from '@schema/entities/user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private userRepository: Repository<User>
   ) {}
 
   async findAll() {
