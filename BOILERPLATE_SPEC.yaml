@@ -181,9 +181,6 @@ structure:
       directories:
         - mongoose
         - rabbitmq
-        - throttler
-        - queue
-        - storage
         - logger
         - validation
         - configs
@@ -332,9 +329,7 @@ features:
 
   file_upload:
     enabled: true
-    storage:
-      - local
-      - s3
+    note: 'Storage module removed - implement storage strategy in FileService'
     limits:
       file_size: '10mb'
       files_per_request: 5
@@ -377,124 +372,61 @@ features:
       - custom_metrics
 
 # Module Specifications
-# All modules live under src/api/ following the proposed structure
-modules:
-  auth:
-    location: 'src/api/auth'
-    description: 'Authentication and authorization module'
-    endpoints:
-      - method: POST
-        path: '/auth/register'
-        description: 'Register new user'
-        public: true
-      - method: POST
-        path: '/auth/login'
-        description: 'Login user'
-        public: true
-      - method: POST
-        path: '/auth/refresh'
-        description: 'Refresh access token'
-        public: true
-      - method: POST
-        path: '/auth/logout'
-        description: 'Logout user'
-        authenticated: true
-      - method: POST
-        path: '/auth/verify-email'
-        description: 'Verify email address'
-        public: true
-      - method: POST
-        path: '/auth/forgot-password'
-        description: 'Request password reset'
-        public: true
-      - method: POST
-        path: '/auth/reset-password'
-        description: 'Reset password'
-        public: true
-    entities:
-      - User
-      - RefreshToken
-    services:
-      - AuthService
-      - TokenService
-      - PasswordService
+# All API features consolidated into single ApiModule at src/api/api.module.ts
+# This approach simplifies dependency management and avoids circular dependencies
+api_module:
+  location: 'src/api'
+  description: 'Single consolidated API module for all features'
+  structure: 'Single module pattern - no separate modules per feature'
+  file: 'api.module.ts'
+  benefits:
+    - 'Simplified dependency management'
+    - 'Avoids circular dependencies'
+    - 'Easier to manage shared services'
+    - 'All services can inject each other without module imports'
+  features:
+    users:
+      location: 'src/api/users'
+      description: 'User management'
+      files:
+        - users.controller.ts
+        - users.service.ts
+      endpoints:
+        - method: GET
+          path: '/users'
+          description: 'Get all users'
+          roles: [ADMIN, SUPER_ADMIN]
+        - method: GET
+          path: '/users/:id'
+          description: 'Get user by id'
+          authenticated: true
+        - method: GET
+          path: '/users/me'
+          description: 'Get current user profile'
+          authenticated: true
+        - method: PATCH
+          path: '/users/me'
+          description: 'Update current user profile'
+          authenticated: true
+        - method: DELETE
+          path: '/users/:id'
+          description: 'Delete user'
+          roles: [SUPER_ADMIN]
 
-  users:
-    location: 'src/api/users'
-    description: 'User management module'
-    endpoints:
-      - method: GET
-        path: '/users'
-        description: 'Get all users'
-        roles: [ADMIN, SUPER_ADMIN]
-      - method: GET
-        path: '/users/:id'
-        description: 'Get user by id'
-        authenticated: true
-      - method: GET
-        path: '/users/me'
-        description: 'Get current user profile'
-        authenticated: true
-      - method: PATCH
-        path: '/users/me'
-        description: 'Update current user profile'
-        authenticated: true
-      - method: DELETE
-        path: '/users/:id'
-        description: 'Delete user'
-        roles: [SUPER_ADMIN]
-    entities:
-      - User
-      - UserProfile
-    services:
-      - UsersService
-
-  mail:
-    location: 'src/api/mail'
-    description: 'Email service module'
-    features:
-      - send_email
-      - send_template_email
-      - queue_email
-    templates:
-      - welcome
-      - verification
-      - password_reset
-
-  file:
-    location: 'src/api/file'
-    description: 'File upload and management module'
-    endpoints:
-      - method: POST
-        path: '/files/upload'
-        description: 'Upload file'
-        authenticated: true
-      - method: GET
-        path: '/files/:id'
-        description: 'Get file'
-        authenticated: true
-      - method: DELETE
-        path: '/files/:id'
-        description: 'Delete file'
-        authenticated: true
-    entities:
-      - File
-    services:
-      - FileService
-      - StorageService
-
-  health:
-    location: 'src/api/health'
-    description: 'Health check module'
-    endpoints:
-      - method: GET
-        path: '/health'
-        description: 'Overall health check'
-        public: true
-      - method: GET
-        path: '/health/database'
-        description: 'Database health check'
-        public: true
+    health:
+      location: 'src/api/health'
+      description: 'Health check'
+      files:
+        - health.controller.ts
+      endpoints:
+        - method: GET
+          path: '/health'
+          description: 'Overall health check'
+          public: true
+        - method: GET
+          path: '/health/database'
+          description: 'Database health check'
+          public: true
 
 # Database Schema - MongoDB with Mongoose
 database_schema:
@@ -1352,50 +1284,6 @@ additional:
           - RabbitMQModule
           - RabbitMQService
           - RabbitMqConfig
-
-  throttler_module:
-    enabled: true
-    location: 'src/lib/throttler'
-    description: 'Global Throttler module for rate limiting with validation'
-    dependencies:
-      - '@nestjs/throttler - NestJS rate limiting module'
-    files:
-      throttler_dto:
-        file: 'throttler.dto.ts'
-        description: 'Throttler configuration DTO with validation'
-        class: 'ThrottlerConfig'
-        fields:
-          - 'RATE_LIMIT_TTL!: number - Time to live in seconds (required, min: 1, auto-transformed from string)'
-          - 'RATE_LIMIT_MAX!: number - Maximum requests per TTL (required, min: 1, auto-transformed from string)'
-        validation: 'class-validator decorators (@IsNumber, @Min, @IsNotEmpty) with @Transform'
-        note: 'Automatically converts string env variables to numbers'
-      throttler_module:
-        file: 'throttler.module.ts'
-        class: 'ThrottlerModule'
-        description: 'Global module wrapping @nestjs/throttler with configuration validation'
-        decorators:
-          - '@Global() - Available app-wide without imports'
-        features:
-          - config_service_validation
-          - async_configuration
-          - ttl_conversion_to_milliseconds
-          - nestjs_throttler_wrapper
-        imports:
-          - 'ThrottlerModule.forRootAsync() with factory pattern'
-        configuration:
-          - 'TTL converted from seconds to milliseconds'
-          - 'Uses ConfigService.validate() with ThrottlerConfig'
-        exports:
-          - '_ThrottlerModule - Aliased @nestjs/throttler module'
-        dependencies:
-          - ConfigService from @lib/configs
-        note: 'Wraps @nestjs/throttler with validation and converts TTL to milliseconds'
-      index:
-        file: 'index.ts'
-        description: 'Barrel export file'
-        exports:
-          - ThrottlerModule
-          - ThrottlerConfig
 
   config_module:
     enabled: true
