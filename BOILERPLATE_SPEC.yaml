@@ -92,6 +92,8 @@ tsconfig:
     '@queries': 'src/queries'
     '@repositories': 'src/repositories'
     '@schemas': 'src/schemas'
+    '@seeds/*': 'src/seeds/*'
+    '@dataloaders': 'src/dataloaders'
     '@events': 'src/events'
   include:
     - 'src/**/*'
@@ -180,6 +182,7 @@ structure:
       description: 'Built-in modules and core functionality'
       directories:
         - mongoose
+        - typeorm
         - rabbitmq
         - logger
         - validation
@@ -187,6 +190,15 @@ structure:
         - jwt
         - i18next
         - ioredis
+
+    entities:
+      description: 'TypeORM entities for PostgreSQL database'
+      note: 'All entity classes use Entity suffix (UserEntity, TodoEntity, etc.)'
+      files:
+        - base.entity.ts
+        - user.entity.ts
+        - todo.entity.ts
+        - index.ts
 
     schemas:
       description: 'MongoDB schemas with Mongoose for data structure'
@@ -199,6 +211,7 @@ structure:
 
     seed:
       description: 'Seeding data models and fixtures'
+      note: 'Located in src/seeds for proper path alias support'
       files:
         - user.seed.ts
         - admin.seed.ts
@@ -680,8 +693,15 @@ environment:
   required:
     - NODE_ENV
     - PORT
-    - API_PREFIX
     - MONGO_DB_URI
+    - DB_HOST
+    - DB_PORT
+    - DB_SCHEMA
+    - DB_USERNAME
+    - DB_PASSWORD
+    - DB_CONNECTION
+    - DB_LOGGING
+    - DB_SYNCHRONIZE
     - RABBIT_MQ_HOST
     - JWT_SECRET
     - JWT_REFRESH_SECRET
@@ -813,7 +833,7 @@ code_quality:
         - 'error'
         - endOfLine: 'auto'
       settings:
-        import/internal-regex: '^@api|@common|@events|@lib|@schemas/'  formatting:
+        import/internal-regex: '^@api|@dataloaders|@common|@dynamodb|@entities|@lib|@models|@queries|@repositories|@schemas|@seeds|@events/'  formatting:
     enabled: true
     tool: 'prettier'
     config:
@@ -926,6 +946,11 @@ vscode:
       editor.tabSize: 2
       git.autofetch: true
       typescript.tsdk: 'node_modules/typescript/lib'
+      typescriptHero.imports.grouping:
+        - 'Plains'
+        - 'Modules'
+        - '/^@api|@common|@dynamodb|@entities|@lib|@models|@queries|@repositories|@schemas|@seeds|@events/'
+        - 'Workspace'
       files.exclude:
         - '**/.git'
         - 'node_modules'
@@ -1183,6 +1208,83 @@ additional:
           - MongooseModule
           - MongooseProvider
 
+  typeorm_module:
+    enabled: true
+    location: 'src/lib/typeorm'
+    description: 'Global TypeORM module for PostgreSQL database with dynamic entity registration'
+    files:
+      typeorm_dto:
+        file: 'typeorm.dto.ts'
+        description: 'TypeORM configuration DTO with validation'
+        class: 'TypeOrmConfig'
+        fields:
+          - 'DB_HOST!: string - Database host (required)'
+          - 'DB_PORT!: number - Database port (required, transformed to number)'
+          - 'DB_SCHEMA!: string - Database schema/name (required)'
+          - 'DB_USERNAME!: string - Database username (required)'
+          - 'DB_PASSWORD!: string - Database password (required)'
+          - 'DB_CONNECTION!: string - Database type (required, e.g., postgres)'
+          - 'DB_LOGGING!: boolean - Enable query logging (required, transformed to boolean)'
+          - 'DB_SYNCHRONIZE!: boolean - Auto sync schema (required, transformed to boolean)'
+        validation: 'class-validator decorators (@IsString, @IsNotEmpty, @IsNumber, @IsBoolean)'
+      typeorm_service:
+        file: 'typeorm.service.ts'
+        class: 'TypeOrmConfigService'
+        description: 'TypeOrmOptionsFactory implementation for connection configuration'
+        implements: 'TypeOrmOptionsFactory'
+        features:
+          - config_service_validation
+          - dynamic_configuration
+          - injectable_service
+          - entity_auto_discovery
+        methods:
+          - 'createTypeOrmOptions(): TypeOrmModuleOptions - Returns connection config'
+        validation: 'Uses ConfigService.validate() with TypeOrmConfig DTO'
+        dependencies:
+          - ConfigService from @lib/configs
+        note: 'Auto-discovers all entities from @entities'
+      typeorm_module:
+        file: 'typeorm.module.ts'
+        class: 'TypeOrmModule'
+        description: 'Global module with dynamic entity registration'
+        decorators:
+          - '@Global() - Available app-wide without imports'
+        features:
+          - dynamic_entity_registration
+          - auto_discovery_pattern
+          - typeorm_alias_import
+        imports:
+          - 'TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService })'
+          - 'TypeOrmModule.forFeature([...Object.values(Entities)])'
+        entity_discovery:
+          pattern: 'Object.values(Entities)'
+          source: '@entities'
+        exports:
+          - 'OrmModule - Aliased @nestjs/typeorm module'
+        note: 'Auto-discovers all entities from src/entities without manual registration'
+      base_repository:
+        file: 'base.repository.ts'
+        class: 'BaseRepository<T>'
+        description: 'Custom repository with enhanced SQL query capabilities'
+        extends: 'Repository<T>'
+        features:
+          - raw_sql_execution
+          - parameterized_queries
+          - sql_file_execution
+          - sql_injection_protection
+        methods:
+          - '$runSQL<T>(sql: string, params: ObjectLiteral): Promise<T> - Execute raw SQL with parameters'
+          - '$runSQLFile<T>(sqlPath: string, params: ObjectLiteral): Promise<T> - Execute SQL from file'
+        note: 'Uses TypeORM driver escapeQueryWithParameters for SQL injection protection'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file'
+        exports:
+          - TypeOrmConfig
+          - TypeOrmModule
+          - TypeOrmConfigService
+          - BaseRepository
+
   rabbitmq_module:
     enabled: true
     location: 'src/lib/rabbitmq'
@@ -1298,8 +1400,29 @@ additional:
           - Production
           - Test
           - Staging
+        fields:
+          - 'NODE_ENV!: Environment - Application environment (required)'
+          - 'PORT!: number - Server port (required, with @Transform to number)'
+          - 'MAIL_HOST?: string - Mail server host (optional)'
+          - 'MAIL_PORT?: number - Mail server port (optional, with @Transform to number)'
+          - 'MAIL_USER?: string - Mail server username (optional)'
+          - 'MAIL_PASSWORD?: string - Mail server password (optional)'
+          - 'MAIL_FROM?: string - Default sender email (optional)'
+          - 'AWS_ACCESS_KEY_ID?: string - AWS access key (optional)'
+          - 'AWS_SECRET_ACCESS_KEY?: string - AWS secret key (optional)'
+          - 'AWS_REGION?: string - AWS region (optional)'
+          - 'AWS_S3_BUCKET?: string - S3 bucket name (optional)'
+          - 'CORS_ORIGIN?: string - CORS allowed origins (optional)'
+          - 'RATE_LIMIT_TTL?: number - Rate limit time window (optional, with @Transform to number)'
+          - 'RATE_LIMIT_MAX?: number - Max requests per TTL (optional, with @Transform to number)'
         validation_strategy: 'class-validator decorators'
         convention: 'Required fields use !, Optional fields use ?'
+        transform_decorators:
+          - 'PORT - @Transform(x => +x.value) for string to number conversion'
+          - 'MAIL_PORT - @Transform(x => +x.value) for string to number conversion'
+          - 'RATE_LIMIT_TTL - @Transform(x => +x.value) for string to number conversion'
+          - 'RATE_LIMIT_MAX - @Transform(x => +x.value) for string to number conversion'
+        note: 'Database environment variables (DB_*) handled by TypeORM module'
       config_service:
         file: 'config.service.ts'
         description: 'Service to validate and access environment variables'
@@ -1710,7 +1833,8 @@ additional:
     note: 'Enums are no longer exported directly, only available through T namespace'
 
   seed_data:
-    enabled: true
+    enabled: trues'
+    path_alias: '@seeds/*
     location: 'src/seed'
     data:
       - super_admin_user
@@ -1837,34 +1961,50 @@ additional:
   main_application:
     enabled: true
     location: 'src/main.ts'
-    description: 'Main application bootstrap with WebSocket Redis adapter setup'
+    description: 'Main application bootstrap with Swagger configuration'
     features:
       - nest_application_factory
       - global_validation_pipe
       - cors_configuration
       - helmet_security
       - swagger_documentation
-      - websocket_redis_adapter
+      - custom_swagger_options
       - environment_based_configuration
-    websocket_setup:
-      - redis_io_adapter_configuration
-      - connect_to_redis_before_listen
-      - use_redis_adapter_for_socketio
+    imports:
+      - '@common - swaggerDescription, swaggerOptions for custom Swagger UI'
+      - '@lib/logger/logger.service - LoggerService for application logging'
+      - '@lib/configs - ConfigService for environment variables'
+    swagger_setup:
+      - uses_swagger_description_from_common
+      - uses_swagger_options_from_common
+      - external_doc_postman_collection
+      - setup_at_api_docs_path
     bootstrap_sequence:
       - create_nest_application
       - get_config_service
-      - set_global_prefix
-      - enable_versioning
+      - get_logger_service
+      - set_global_prefix_api
+      - enable_versioning_uri_v1
       - configure_security_helmet
-      - configure_cors
+      - configure_cors_from_env
       - setup_global_validation_pipe
       - setup_swagger_documentation
-      - configure_redis_io_adapter
-      - connect_redis_adapter
       - start_server_listening
-      required_imports:
-        - '@events/redis-io.adapter'
-        - '@lib/configs/config.service'
+      - log_application_urls
+    global_prefix: 'api'
+    api_versioning:
+      type: 'URI'
+      default_version: '1'
+    swagger_config:
+      title: 'NestJS Enterprise Boilerplate'
+      description: 'Uses swaggerDescription from @common'
+      version: '1.0'
+      auth: 'Bearer'
+      external_doc:
+        name: 'Postman Collection'
+        url: '/docs-json'
+      path: 'api/docs'
+      options: 'Uses swaggerOptions from @common'
 
   schemas_module:
     enabled: true
@@ -2066,4 +2206,77 @@ additional:
           - 'Todo - Todo schema class'
           - 'TodoDocument - Todo document type'
           - 'TodoSchema - Todo Mongoose schema'
+        note: 'Enums are accessed via T namespace from @common (T.UserRole, T.TodoStatus, etc.)'
+
+  entities_module:
+    enabled: true
+    location: 'src/entities'
+    description: 'TypeORM entities for PostgreSQL database with entity management'
+    approach: 'Pure TypeORM entities with decorators for PostgreSQL'
+    namespace_usage: 'Uses T namespace for enums (T.UserRole, T.TodoStatus, etc.)'
+    naming_convention: 'All entity classes use Entity suffix (UserEntity, TodoEntity, etc.)'
+    database: 'PostgreSQL'
+    files:
+      base_entity:
+        file: 'base.entity.ts'
+        class: 'BaseEntity'
+        description: 'Base entity class with PostgreSQL audit fields'
+        features:
+          - auto_increment_primary_key
+          - timestamptz_support
+          - creation_tracking
+          - update_tracking
+          - user_tracking
+        properties:
+          - 'id!: number - Auto-increment primary key (integer)'
+          - 'createdAt!: Date - Auto-generated timestamp when record was created (timestamptz)'
+          - 'updatedAt!: Date - Auto-generated timestamp when record was last updated (timestamptz)'
+          - 'createdBy?: number - User ID who created the record (integer, nullable)'
+          - 'updatedBy?: number - User ID who last updated the record (integer, nullable)'
+        decorators:
+          - '@PrimaryGeneratedColumn - Auto-increment primary key'
+          - '@CreateDateColumn - Auto-managed creation timestamp'
+          - '@UpdateDateColumn - Auto-managed update timestamp'
+          - '@Column - Audit user tracking fields'
+        dependencies:
+          - 'typeorm'
+        note: 'Base class to be extended by all other entity classes'
+      user_entity:
+        file: 'user.entity.ts'
+        class: 'UserEntity'
+        description: 'User entity for PostgreSQL'
+        extends: 'BaseEntity'
+        table: 'users'
+        indexes:
+          - 'email, firstName, lastName, role, status, isEmailVerified, lastLoginAt, phoneNumber, loginCount'
+          - 'Compound: [role, status], [status, isEmailVerified], [firstName, lastName]'
+        relations:
+          - 'assignedTodos: TodoEntity[]'
+          - 'todos: TodoEntity[]'
+        virtual_properties:
+          - 'fullName, initials, isAdmin, isActive, age'
+      todo_entity:
+        file: 'todo.entity.ts'
+        class: 'TodoEntity'
+        description: 'Todo entity for PostgreSQL'
+        extends: 'BaseEntity'
+        table: 'todos'
+        indexes:
+          - 'title, status, priority, category, dueDate, completedAt, assignedTo, isArchived, parentId, tags'
+        relations:
+          - 'assignedToUser?: UserEntity'
+          - 'collaborators?: UserEntity[]'
+          - 'parent?: TodoEntity'
+          - 'children?: TodoEntity[]'
+        join_table:
+          - 'todo_collaborators - Many-to-many junction table'
+        virtual_properties:
+          - 'isOverdue, daysUntilDue, isHighPriority, efficiency, displayTitle'
+      index:
+        file: 'index.ts'
+        description: 'Barrel export file for all entities'
+        exports:
+          - 'BaseEntity'
+          - 'UserEntity'
+          - 'TodoEntity'
         note: 'Enums are accessed via T namespace from @common (T.UserRole, T.TodoStatus, etc.)'

@@ -1,37 +1,37 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { ConfigService } from '@lib/configs';
 import { LoggerService } from '@lib/logger/logger.service';
+import { swaggerDescription, swaggerOptions } from '@common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    bufferLogs: true,
+    bufferLogs: true
   });
 
   const configService = app.get(ConfigService);
   const logger = app.get(LoggerService);
 
   // Set global prefix
-  const apiPrefix = configService.get<string>('API_PREFIX', 'api');
-  app.setGlobalPrefix(apiPrefix);
+  app.setGlobalPrefix('api');
 
   // Enable versioning
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '1',
+    defaultVersion: '1'
   });
 
   // Security
   app.use(helmet());
 
   // CORS
-  const corsOrigin = configService.get<string>('CORS_ORIGIN', '*');
+  const corsOrigin = configService.env.CORS_ORIGIN || '*';
   app.enableCors({
     origin: corsOrigin.split(','),
-    credentials: true,
+    credentials: true
   });
 
   // Global validation pipe
@@ -41,35 +41,28 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
+        enableImplicitConversion: true
+      }
+    })
   );
 
   // Swagger documentation
   const swaggerConfig = new DocumentBuilder()
     .setTitle('NestJS Enterprise Boilerplate')
-    .setDescription('Production-ready NestJS API with authentication and best practices')
+    .setDescription(swaggerDescription)
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('users', 'User management endpoints')
-    .addTag('files', 'File upload endpoints')
-    .addTag('health', 'Health check endpoints')
+    .setExternalDoc('Postman Collection', '/docs-json')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup(`${apiPrefix}/docs`, app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
+  SwaggerModule.setup('api/docs', app, document, { swaggerOptions });
 
-  const port = configService.get<number>('PORT', 3000);
+  const port = configService.env.PORT;
   await app.listen(port);
 
-  logger.log(`🚀 Application is running on: http://localhost:${port}/${apiPrefix}`);
-  logger.log(`📚 API Documentation: http://localhost:${port}/${apiPrefix}/docs`);
+  logger.log(`🚀 Application is running on: http://localhost:${port}/api`);
+  logger.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

@@ -1,6 +1,3 @@
-// Base schema
-export * from './base.schema';
-
 // User schema
 export * from './user.schema';
 

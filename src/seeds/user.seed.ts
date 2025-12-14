@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User, UserRole } from '@schema/entities/user.entity';
+import { User } from '@schemas';
+import { T } from '@common';
 
 export class UserSeeder {
   constructor(private dataSource: DataSource) {}
@@ -19,7 +20,7 @@ export class UserSeeder {
         password: await bcrypt.hash('Admin123!', 10),
         firstName: 'Super',
         lastName: 'Admin',
-        role: UserRole.SUPER_ADMIN,
+        role: T.UserRole.ADMIN,
         isActive: true,
         isEmailVerified: true
       });
@@ -39,7 +40,7 @@ export class UserSeeder {
         password: await bcrypt.hash('User123!', 10),
         firstName: 'Test',
         lastName: 'User',
-        role: UserRole.USER,
+        role: T.UserRole.USER,
         isActive: true,
         isEmailVerified: true
       });

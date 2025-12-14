@@ -30,7 +30,8 @@
       "@models": ["src/models"],
       "@queries": ["src/queries"],
       "@repositories": ["src/repositories"],
-      "@schemas": ["src/schema"],
+      "@schemas": ["src/schemas"],
+      "@seeds/*": ["src/seeds/*"],
       "@dataloaders": ["src/dataloaders"],
       "@events": ["src/events"]
     }

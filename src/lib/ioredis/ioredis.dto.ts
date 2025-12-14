@@ -6,9 +6,9 @@ export class IORedisConfig {
   @IsString()
   REDIS_HOST!: string;
 
+  @Transform(x => +x.value)
   @IsNotEmpty()
   @IsNumber()
-  @Transform(x => +x)
   REDIS_PORT!: number;
 
   @IsOptional()

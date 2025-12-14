@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export enum Environment {
@@ -12,44 +13,17 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   NODE_ENV!: Environment;
 
+  @Transform(x => +x.value)
   @IsNumber()
   @IsNotEmpty()
   PORT!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  API_PREFIX!: string;
-
-  // Database
-  @IsString()
-  @IsNotEmpty()
-  DATABASE_HOST!: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  DATABASE_PORT!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  DATABASE_USERNAME!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  DATABASE_PASSWORD!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  DATABASE_NAME!: string;
-
-  @IsString()
-  @IsOptional()
-  DATABASE_SSL?: string;
 
   // Mail
   @IsString()
   @IsOptional()
   MAIL_HOST?: string;
 
+  @Transform(x => +x.value)
   @IsNumber()
   @IsOptional()
   MAIL_PORT?: number;
@@ -89,10 +63,12 @@ export class EnvironmentVariables {
   CORS_ORIGIN?: string;
 
   // Rate Limiting
+  @Transform(x => +x.value)
   @IsNumber()
   @IsOptional()
   RATE_LIMIT_TTL?: number;
 
+  @Transform(x => +x.value)
   @IsNumber()
   @IsOptional()
   RATE_LIMIT_MAX?: number;
