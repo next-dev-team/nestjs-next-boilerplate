@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule as OrmModule } from '@nestjs/typeorm';
 
 import * as Entities from '@entities';
+import * as Repositories from '@repositories';
 
 import { TypeOrmConfigService } from './typeorm.service';
 
@@ -11,6 +12,7 @@ import { TypeOrmConfigService } from './typeorm.service';
     OrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     OrmModule.forFeature([...Object.values(Entities)])
   ],
-  exports: [OrmModule]
+  providers: [...Object.values(Repositories)],
+  exports: [OrmModule, ...Object.values(Repositories)]
 })
 export class TypeOrmModule {}
