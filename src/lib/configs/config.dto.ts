@@ -72,4 +72,13 @@ export class EnvironmentVariables {
   @IsNumber()
   @IsOptional()
   RATE_LIMIT_MAX?: number;
+
+  // Telegram Bot
+  @IsString()
+  @IsNotEmpty()
+  TELEGRAM_BOT_TOKEN!: string;
+
+  @IsString()
+  @IsOptional()
+  TELEGRAM_ADMIN_ID?: string;
 }

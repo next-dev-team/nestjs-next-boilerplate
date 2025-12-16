@@ -1,5 +1,2 @@
-// User schema
-export * from './user.schema';
-
-// Todo schema
-export * from './todo.schema';
+// Invoice schema
+export * from './invoice.schema';

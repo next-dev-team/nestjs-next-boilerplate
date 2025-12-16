@@ -3,16 +3,15 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 
 // Controllers
-import { UsersController } from './users/users.controller';
 import { HealthController } from './health/health.controller';
 
 // Services
-import { UsersService } from './users/users.service';
+import { TelegramService } from './telegram/telegram.service';
 
 @Module({
   imports: [TerminusModule, HttpModule],
-  controllers: [UsersController, HealthController],
-  providers: [UsersService],
-  exports: [UsersService]
+  controllers: [HealthController],
+  providers: [TelegramService],
+  exports: [TelegramService]
 })
 export class ApiModule {}

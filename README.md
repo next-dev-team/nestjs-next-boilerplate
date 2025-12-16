@@ -9,7 +9,7 @@ Production-ready NestJS boilerplate with authentication, database, WebSocket, an
 - 📁 **File Upload**: Local and S3 storage support with validation
 - 📧 **Email Service**: Template-based emails with queue support
 - 🔌 **WebSocket**: Real-time communication with Socket.IO
-- 🗄️ **Database**: PostgreSQL with TypeORM, migrations, and seeding
+- 🗄️ **Database**: MongoDB with Mongoose ODM
 - ⚡ **Caching**: Redis integration for performance
 - 📝 **API Documentation**: Auto-generated Swagger/OpenAPI docs
 - 🔒 **Security**: Helmet, rate limiting, input validation
@@ -40,7 +40,7 @@ Production-ready NestJS boilerplate with authentication, database, WebSocket, an
 ## Prerequisites
 
 - Node.js >= 20.0.0
-- PostgreSQL >= 14
+- MongoDB >= 6.0
 - Redis >= 6
 - npm or yarn
 
@@ -66,18 +66,6 @@ cp .env.example .env
 ```
 
 4. Update `.env` with your configuration
-
-5. Run database migrations:
-
-```bash
-npm run migration:run
-```
-
-6. Seed the database:
-
-```bash
-npm run seed
-```
 
 ## Running the Application
 
@@ -126,9 +114,6 @@ npm run test:cov
 - `npm run format` - Format code with Prettier
 - `npm run test` - Run unit tests
 - `npm run test:e2e` - Run E2E tests
-- `npm run migration:generate` - Generate migration
-- `npm run migration:run` - Run migrations
-- `npm run seed` - Seed database
 
 ## Environment Variables
 
