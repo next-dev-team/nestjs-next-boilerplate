@@ -183,12 +183,23 @@ export class TelegramService implements OnModuleInit {
         return;
       }
 
-      const total = invoices.reduce((sum, inv) => sum + inv.amount, 0);
-      const currency = invoices[0]?.currency || 'USD';
+      // Group by currency
+      const byCurrency = new Map<string, typeof invoices>();
+      invoices.forEach(inv => {
+        const curr = inv.currency || 'USD';
+        if (!byCurrency.has(curr)) byCurrency.set(curr, []);
+        byCurrency.get(curr)!.push(inv);
+      });
 
       let message = `📊 Invoice Summary (Last 50)\n\n`;
-      message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)}\n`;
-      message += `Count: ${invoices.length}\n\n`;
+
+      // Show totals per currency
+      byCurrency.forEach((currInvoices, currency) => {
+        const total = currInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+        message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)} (${currInvoices.length} invoices)\n`;
+      });
+
+      message += `\nCount: ${invoices.length} total\n\n`;
 
       message += `Recent invoices:\n`;
       invoices.slice(0, 10).forEach((inv, idx) => {
@@ -221,12 +232,23 @@ export class TelegramService implements OnModuleInit {
         return;
       }
 
-      const total = invoices.reduce((sum, inv) => sum + inv.amount, 0);
-      const currency = invoices[0]?.currency || 'USD';
+      // Group by currency
+      const byCurrency = new Map<string, typeof invoices>();
+      invoices.forEach(inv => {
+        const curr = inv.currency || 'USD';
+        if (!byCurrency.has(curr)) byCurrency.set(curr, []);
+        byCurrency.get(curr)!.push(inv);
+      });
 
       let message = `📅 Today's Invoices\n\n`;
-      message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)}\n`;
-      message += `Count: ${invoices.length}\n\n`;
+
+      // Show totals per currency
+      byCurrency.forEach((currInvoices, currency) => {
+        const total = currInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+        message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)} (${currInvoices.length} invoices)\n`;
+      });
+
+      message += `\nCount: ${invoices.length} total\n\n`;
 
       invoices.forEach((inv, idx) => {
         const time = new Date(inv.paymentDate).toLocaleTimeString('en-US', {
@@ -262,8 +284,13 @@ export class TelegramService implements OnModuleInit {
         return;
       }
 
-      const total = invoices.reduce((sum, inv) => sum + inv.amount, 0);
-      const currency = invoices[0]?.currency || 'USD';
+      // Group by currency
+      const byCurrency = new Map<string, typeof invoices>();
+      invoices.forEach(inv => {
+        const curr = inv.currency || 'USD';
+        if (!byCurrency.has(curr)) byCurrency.set(curr, []);
+        byCurrency.get(curr)!.push(inv);
+      });
 
       // Group by day
       const byDay = new Map<string, typeof invoices>();
@@ -274,12 +301,29 @@ export class TelegramService implements OnModuleInit {
       });
 
       let message = `📅 This Week's Invoices\n\n`;
-      message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)}\n`;
-      message += `Count: ${invoices.length}\n\n`;
+
+      // Show totals per currency
+      byCurrency.forEach((currInvoices, currency) => {
+        const total = currInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+        message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)} (${currInvoices.length} invoices)\n`;
+      });
+
+      message += `\nCount: ${invoices.length} total\n\n`;
 
       byDay.forEach((dayInvoices, day) => {
-        const dayTotal = dayInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-        message += `${day}: ${InvoiceParserUtil.formatAmount(dayTotal, currency)} (${dayInvoices.length})\n`;
+        // Show breakdown by currency for each day
+        const dayCurrencies = new Map<string, number>();
+        dayInvoices.forEach(inv => {
+          const curr = inv.currency || 'USD';
+          dayCurrencies.set(curr, (dayCurrencies.get(curr) || 0) + inv.amount);
+        });
+
+        message += `${day}: `;
+        const currencyParts: string[] = [];
+        dayCurrencies.forEach((amount, currency) => {
+          currencyParts.push(InvoiceParserUtil.formatAmount(amount, currency));
+        });
+        message += `${currencyParts.join(' + ')} (${dayInvoices.length})\n`;
       });
 
       await ctx.reply(message);
@@ -308,31 +352,47 @@ export class TelegramService implements OnModuleInit {
         return;
       }
 
-      const total = invoices.reduce((sum, inv) => sum + inv.amount, 0);
-      const currency = invoices[0]?.currency || 'USD';
-
-      // Group by payer
-      const byPayer = new Map<string, typeof invoices>();
+      // Group by currency
+      const byCurrency = new Map<string, typeof invoices>();
       invoices.forEach(inv => {
-        if (!byPayer.has(inv.payer)) byPayer.set(inv.payer, []);
-        byPayer.get(inv.payer)!.push(inv);
+        const curr = inv.currency || 'USD';
+        if (!byCurrency.has(curr)) byCurrency.set(curr, []);
+        byCurrency.get(curr)!.push(inv);
+      });
+
+      // Group by day
+      const byDay = new Map<string, typeof invoices>();
+      invoices.forEach(inv => {
+        const day = new Date(inv.paymentDate).toLocaleDateString();
+        if (!byDay.has(day)) byDay.set(day, []);
+        byDay.get(day)!.push(inv);
       });
 
       let message = `📅 This Month's Invoices\n\n`;
-      message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)}\n`;
-      message += `Count: ${invoices.length}\n\n`;
 
-      message += `By Payer:\n`;
-      Array.from(byPayer.entries())
-        .sort((a, b) => {
-          const totalA = a[1].reduce((sum, inv) => sum + inv.amount, 0);
-          const totalB = b[1].reduce((sum, inv) => sum + inv.amount, 0);
-          return totalB - totalA;
-        })
-        .forEach(([payer, payerInvoices]) => {
-          const payerTotal = payerInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-          message += `• ${payer}: ${InvoiceParserUtil.formatAmount(payerTotal, currency)} (${payerInvoices.length})\n`;
+      // Show totals per currency
+      byCurrency.forEach((currInvoices, currency) => {
+        const total = currInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+        message += `Total: ${InvoiceParserUtil.formatAmount(total, currency)} (${currInvoices.length} invoices)\n`;
+      });
+
+      message += `\nCount: ${invoices.length} total\n\n`;
+
+      byDay.forEach((dayInvoices, day) => {
+        // Show breakdown by currency for each day
+        const dayCurrencies = new Map<string, number>();
+        dayInvoices.forEach(inv => {
+          const curr = inv.currency || 'USD';
+          dayCurrencies.set(curr, (dayCurrencies.get(curr) || 0) + inv.amount);
         });
+
+        message += `${day}: `;
+        const currencyParts: string[] = [];
+        dayCurrencies.forEach((amount, currency) => {
+          currencyParts.push(InvoiceParserUtil.formatAmount(amount, currency));
+        });
+        message += `${currencyParts.join(' + ')} (${dayInvoices.length})\n`;
+      });
 
       await ctx.reply(message);
     } catch (error) {
@@ -345,30 +405,40 @@ export class TelegramService implements OnModuleInit {
     try {
       const chatId = ctx.chat?.id.toString();
 
-      const [totalCount, totalAmount, topPayers] = await Promise.all([
+      const [totalCount, totalByCurrency, topPayers] = await Promise.all([
         this.invoiceModel.countDocuments({ telegramChatId: chatId }),
         this.invoiceModel.aggregate([
           { $match: { telegramChatId: chatId } },
-          { $group: { _id: null, total: { $sum: '$amount' } } }
+          { $group: { _id: '$currency', total: { $sum: '$amount' }, count: { $sum: 1 } } }
         ]),
         this.invoiceModel.aggregate([
           { $match: { telegramChatId: chatId } },
-          { $group: { _id: '$payer', total: { $sum: '$amount' }, count: { $sum: 1 } } },
+          {
+            $group: { _id: { payer: '$payer', currency: '$currency' }, total: { $sum: '$amount' }, count: { $sum: 1 } }
+          },
           { $sort: { total: -1 } },
-          { $limit: 5 }
+          { $limit: 10 }
         ])
       ]);
 
-      const total = totalAmount[0]?.total || 0;
-
       let message = `📈 Statistics\n\n`;
       message += `Total Invoices: ${totalCount}\n`;
-      message += `Total Amount: $${total.toFixed(2)}\n\n`;
+
+      // Show total per currency
+      if (totalByCurrency.length > 0) {
+        totalByCurrency.forEach(item => {
+          const currency = item._id || 'USD';
+          message += `Total: ${InvoiceParserUtil.formatAmount(item.total, currency)} (${item.count} invoices)\n`;
+        });
+      }
+
+      message += '\n';
 
       if (topPayers.length > 0) {
         message += `Top Payers:\n`;
         topPayers.forEach((payer, idx) => {
-          message += `${idx + 1}. ${payer._id}: $${payer.total.toFixed(2)} (${payer.count})\n`;
+          const currency = payer._id.currency || 'USD';
+          message += `${idx + 1}. ${payer._id.payer}: ${InvoiceParserUtil.formatAmount(payer.total, currency)} (${payer.count})\n`;
         });
       }
 
